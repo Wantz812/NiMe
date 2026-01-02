@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zaman Kapsulu ⏳</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent: #ff4d9d;
+      --bg0: #070A12;
+      --bg1: #0B1022;
+
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --cardA: rgba(255,255,255,.10);
+      --cardB: rgba(255,255,255,.06);
+
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+
+      --shadow2: 0 16px 50px rgba(0,0,0,.30);
+
+      --blur: blur(18px);
+      --radius2: 26px;
+
+      --meshA: rgba(255,77,157,.22);
+      --meshB: rgba(61,123,253,.18);
+      --meshC: rgba(47,191,113,.16);
+      --meshD: rgba(255,214,10,.10);
+
+      --safeTop: env(safe-area-inset-top, 0px);
+      --safeBottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 800px at 18% 16%, var(--meshA), transparent 55%),
+        radial-gradient(900px 700px at 86% 20%, var(--meshB), transparent 58%),
+        radial-gradient(900px 650px at 75% 92%, var(--meshC), transparent 60%),
+        radial-gradient(700px 600px at 22% 90%, var(--meshD), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+      transition: filter .35s ease, background .35s ease;
+    }
+    a{ color: inherit; text-decoration:none; }
+
+    .aurora{
+      position: fixed;
+      inset:-30vh -20vw;
+      pointer-events:none;
+      z-index:0;
+      opacity:.72;
+      filter: blur(22px) saturate(1.15);
+      mix-blend-mode: screen;
+    }
+    .aurora::before, .aurora::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        conic-gradient(from 180deg at 40% 40%,
+          rgba(255,77,157,.00),
+          rgba(255,77,157,.32),
+          rgba(50,173,230,.22),
+          rgba(52,199,89,.18),
+          rgba(255,214,10,.14),
+          rgba(255,77,157,.26),
+          rgba(255,77,157,.00)
+        );
+      animation: spin 26s linear infinite;
+      transform-origin: 40% 40%;
+    }
+    .aurora::after{
+      inset: 10% 15%;
+      opacity:.68;
+      animation-duration: 34s;
+      transform-origin: 60% 60%;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    .grain{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:.12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .scroll-progress{
+      position: fixed;
+      top:0; left:0;
+      width:100%;
+      height: 3px;
+      z-index: 9999;
+      background: rgba(255,255,255,.06);
+    }
+    .scroll-progress-bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,.85));
+      box-shadow: 0 0 18px rgba(255,77,157,.45);
+    }
+
+    /* Reveal */
+    .reveal{ opacity: 1; transform: none; }
+    html.js .reveal{
+      opacity: 0;
+      transform: translateY(10px) scale(.995);
+      transition: opacity .6s ease, transform .7s ease;
+      will-change: opacity, transform;
+    }
+    html.js .reveal.show{ opacity:1; transform: translateY(0) scale(1); }
+
+    /* Theme switcher */
+    .theme-switcher{
+      position: fixed;
+      right: 14px;
+      top: calc(14px + var(--safeTop));
+      z-index: 300;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      display:grid;
+      grid-template-columns: repeat(2, 34px);
+      gap: 8px;
+    }
+    .theme-switcher button{
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.30);
+      cursor:pointer;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .theme-switcher button:hover{
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.55);
+    }
+    .theme-switcher button.active{
+      border-color: rgba(255,255,255,.90);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.10), 0 0 26px rgba(0,0,0,.22);
+      transform: scale(1.06);
+    }
+
+    .app{
+      position: relative;
+      z-index: 3;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safeTop)) 18px calc(28px + var(--safeBottom));
+    }
+
+    .glass{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+    }
+    .glass-inner{ padding: 18px; }
+
+    header{
+      display:flex; flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 900;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      white-space: nowrap;
+    }
+    .back-link:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+
+    h1{
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.0rem, 3.7vw, 2.6rem);
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+      color: rgba(255,255,255,.96);
+    }
+    .subtitle{
+      margin: 8px 0 0;
+      font-family: "Dancing Script", cursive;
+      font-size: 1.35rem;
+      color: var(--muted);
+    }
+
+    .hero{
+      margin-top: 14px;
+      position: relative;
+    }
+    .hero .glass-inner{
+      padding: 20px;
+      position: relative;
+    }
+    .hero .glass-inner::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(620px 280px at 20% 22%, rgba(255,77,157,.22), transparent 60%),
+        radial-gradient(620px 280px at 80% 78%, rgba(61,123,253,.18), transparent 60%);
+      opacity: .75;
+      filter: blur(18px);
+      z-index: 0;
+    }
+    .hero .glass-inner > *{ position: relative; z-index: 1; }
+
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      box-shadow: 0 18px 54px rgba(0,0,0,.26);
+      padding: 16px;
+    }
+
+    .h2{
+      margin:0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.35rem;
+      letter-spacing: -0.3px;
+      color: rgba(255,255,255,.95);
+    }
+    .p{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.86);
+      line-height: 1.75;
+    }
+
+    label{
+      display:block;
+      margin-top: 12px;
+      color: var(--muted2);
+      font-size: .92rem;
+      font-weight: 800;
+    }
+    input, textarea, select{
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.92);
+      outline: none;
+      font-family: inherit;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btnrow{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 11px 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease, filter .14s ease;
+      user-select:none;
+      white-space: nowrap;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); box-shadow: 0 16px 40px rgba(0,0,0,.22); }
+    .btn:active{ transform: translateY(0) scale(.99); }
+
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(255,77,157,.40), rgba(255,255,255,.18));
+      border-color: rgba(255,255,255,.18);
+    }
+    .btn-danger{
+      background: rgba(255,77,157,.12);
+      border-color: rgba(255,77,157,.30);
+    }
+
+    .mini{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: .9rem;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+    .pill b{ color: rgba(255,255,255,.92); }
+
+    .list{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .capsule{
+      position: relative;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 54px rgba(0,0,0,.26);
+      overflow: hidden;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .capsule:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 24px 70px rgba(0,0,0,.32);
+    }
+
+    .capsule-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 14px 10px;
+    }
+
+    .capsule-title{
+      margin:0;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: rgba(255,255,255,.95);
+      letter-spacing: -0.2px;
+    }
+    .capsule-meta{
+      margin-top: 6px;
+      color: var(--muted2);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.26);
+      font-weight: 900;
+      color: rgba(255,255,255,.92);
+      white-space: nowrap;
+    }
+    .badge.locked{
+      border-color: rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.88);
+    }
+    .badge.open{
+      border-color: rgba(255,77,157,.28);
+      background: rgba(255,77,157,.12);
+    }
+
+    .capsule-body{
+      padding: 0 14px 14px;
+      display:grid;
+      gap: 10px;
+    }
+
+    .countdown{
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.22);
+      background: rgba(0,0,0,.22);
+      padding: 10px 12px;
+      color: rgba(255,255,255,.90);
+      line-height: 1.6;
+    }
+    .countdown b{ color: rgba(255,255,255,.96); }
+
+    .open-area{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      padding: 12px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      color: rgba(255,255,255,.90);
+    }
+
+    .capsule-actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ghost{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(18px + var(--safeBottom));
+      z-index: 5000;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.50);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: rgba(255,255,255,.92);
+      box-shadow: 0 18px 70px rgba(0,0,0,.40);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      font-weight: 800;
+      font-size: .9rem;
+      max-width: min(92vw, 560px);
+      text-align:center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset:0;
+      z-index: 2500;
+      display:none;
+      padding: 22px 12px;
+      background: rgba(0,0,0,.72);
+    }
+    .modal-card{
+      max-width: 780px;
+      margin: 0 auto;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.38));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: 0 26px 80px rgba(0,0,0,.55);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-title{
+      margin: 0 0 10px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: rgba(255,255,255,.96);
+      font-family: "Playfair Display", serif;
+      letter-spacing: -0.3px;
+    }
+    .close{
+      position:absolute;
+      right: 12px;
+      top: 10px;
+      font-size: 28px;
+      cursor:pointer;
+      color: rgba(255,255,255,.72);
+      user-select:none;
+    }
+    .close:hover{ color: rgba(255,255,255,.95); }
+
+    .modal-content{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      padding: 12px;
+      white-space: pre-wrap;
+      line-height: 1.8;
+      color: rgba(255,255,255,.90);
+    }
+
+    .confetti{
+      position: absolute;
+      inset: -20px;
+      pointer-events: none;
+      opacity: .7;
+      filter: blur(.1px);
+      display:none;
+    }
+    .confetti.show{ display:block; }
+    .piece{
+      position:absolute;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      opacity: .9;
+      animation: pop 1200ms ease forwards;
+      transform: translateY(0) rotate(0deg);
+    }
+    @keyframes pop{
+      0%{ transform: translateY(0) rotate(0deg) scale(1); opacity: 0; }
+      10%{ opacity: 1; }
+      100%{ transform: translateY(520px) rotate(740deg) scale(.95); opacity: 0; }
+    }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      .theme-switcher{ right: 10px; }
+      .app{ padding-left: 14px; padding-right: 14px; }
+    }
+    @media (max-width: 520px){
+      .row{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>document.documentElement.classList.add('js');</script>
+
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar" id="scrollBar"></div></div>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="theme-switcher" aria-label="Tema seçimi">
+    <button id="theme-pink"  data-theme="pink"  title="pink"  style="background: rgba(255,77,157,.95)"></button>
+    <button id="theme-blue"  data-theme="blue"  title="blue"  style="background: rgba(61,123,253,.95)"></button>
+    <button id="theme-green" data-theme="green" title="green" style="background: rgba(47,191,113,.95)"></button>
+    <button id="theme-night" data-theme="night" title="night" style="background: rgba(10,10,20,.95)"></button>
+  </div>
+
+  <div class="app">
+    <div class="glass hero reveal">
+      <div class="glass-inner">
+        <header>
+          <a class="back-link" href="index.html">← Əsas Səhifə</a>
+          <div style="min-width: 240px;">
+            <h1>Zaman Kapsulu</h1>
+            <p class="subtitle">Bu gün yaz — gələcəkdə aç (tarixi gələnə qədər kilidli qalır) ⏳💌</p>
+          </div>
+        </header>
+
+        <div class="mini" id="statsRow">
+          <span class="pill">📦 Kapsullar: <b id="statTotal">0</b></span>
+          <span class="pill">🔒 Kilidli: <b id="statLocked">0</b></span>
+          <span class="pill">🔓 Açıq: <b id="statOpen">0</b></span>
+        </div>
+
+        <div class="grid">
+          <div class="panel reveal">
+            <div class="h2">Yeni kapsul yarat</div>
+            <p class="p">İstəsən: “1 ay sonra oxu”, “doğum günündə aç”, “yeni ildə oxu” kimi yaz.</p>
+
+            <label for="cTitle">Başlıq</label>
+            <input id="cTitle" type="text" placeholder="Məs: 2 ay sonra oxuyacaqsan ✨"/>
+
+            <label for="cText">Mətn</label>
+            <textarea id="cText" placeholder="Burada yazdığın sözlər gələcəkdə açılacaq..."></textarea>
+
+            <div class="row">
+              <div>
+                <label for="cDate">Açılma tarixi</label>
+                <input id="cDate" type="date"/>
+              </div>
+              <div>
+                <label for="cTime">Saat</label>
+                <input id="cTime" type="time"/>
+              </div>
+            </div>
+
+            <div class="btnrow">
+              <button class="btn btn-primary" type="button" id="addBtn">➕ Kapsul əlavə et</button>
+              <button class="btn btn-danger" type="button" id="resetBtn">🧹 Hamısını sıfırla</button>
+            </div>
+
+            <p class="p" style="color: var(--muted2); margin-top: 12px;">
+              Qeyd: Tarix+saata çatanda kapsul “Aç” düyməsi aktiv olacaq.
+            </p>
+          </div>
+
+          <div class="panel reveal">
+            <div class="h2">Sürətli seçim</div>
+            <p class="p">Bir kliklə hazır “açılma tarixi” qoya bilərsən.</p>
+
+            <div class="btnrow">
+              <button class="btn ghost" type="button" data-quick="7">⏱️ 7 gün</button>
+              <button class="btn ghost" type="button" data-quick="30">🗓️ 1 ay</button>
+              <button class="btn ghost" type="button" data-quick="90">✨ 3 ay</button>
+              <button class="btn ghost" type="button" data-quick="365">🎉 1 il</button>
+            </div>
+
+            <div class="p" style="margin-top: 14px; color: var(--muted2);">
+              Bonus: Kapsulu açanda “confetti” effekti gəlir 😄
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass reveal" style="margin-top: 14px;">
+      <div class="glass-inner">
+        <div style="display:flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div>
+            <div class="h2">Kapsulların</div>
+            <div class="p" style="margin-top: 6px; color: var(--muted);">Kilidli kapsullar blur olacaq, açılma vaxtı gələndə “Aç” çıxacaq.</div>
+          </div>
+          <div class="btnrow" style="margin-top: 0;">
+            <button class="btn ghost" type="button" id="sortBtn">↕️ Tarixə görə sırala</button>
+            <button class="btn ghost" type="button" id="addDemoBtn">✨ Demo əlavə et</button>
+          </div>
+        </div>
+
+        <div class="list" id="capsuleList"></div>
+
+        <div style="margin-top: 14px; text-align:center; color: var(--muted2); font-size: .9rem;">
+          “Zaman kapsulu” — romantik site-lərin ən premium hissəsidir 💗
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="confetti" id="confetti"></div>
+      <div class="close" id="close">×</div>
+      <div class="modal-title" id="mTitle">Kapsul</div>
+      <div class="modal-content" id="mText"></div>
+      <div class="btnrow" style="margin-top: 12px;">
+        <button class="btn ghost" type="button" id="copyBtn">📋 Kopyala</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Theme (index ilə eyni localStorage key) =====
+    const themes = {
+      pink:  { accent:'#ff4d9d', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,77,157,.22)', meshB:'rgba(61,123,253,.18)', meshC:'rgba(47,191,113,.16)', meshD:'rgba(255,214,10,.10)' },
+      blue:  { accent:'#3d7bfd', bg0:'#060B16', bg1:'#07162B', cardA:'rgba(210,230,255,.12)', cardB:'rgba(210,230,255,.06)', stroke:'rgba(210,230,255,.16)', stroke2:'rgba(210,230,255,.22)', meshA:'rgba(61,123,253,.24)', meshB:'rgba(50,173,230,.18)', meshC:'rgba(255,77,157,.12)', meshD:'rgba(255,214,10,.08)' },
+      green: { accent:'#2fbf71', bg0:'#06120C', bg1:'#071C12', cardA:'rgba(210,255,230,.12)', cardB:'rgba(210,255,230,.06)', stroke:'rgba(210,255,230,.16)', stroke2:'rgba(210,255,230,.22)', meshA:'rgba(47,191,113,.24)', meshB:'rgba(61,123,253,.12)', meshC:'rgba(255,214,10,.10)', meshD:'rgba(255,77,157,.08)' },
+      night: { accent:'#ffb6c1', bg0:'#05030B', bg1:'#0B0622', cardA:'rgba(255,255,255,.09)', cardB:'rgba(255,255,255,.05)', stroke:'rgba(255,255,255,.11)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,182,193,.18)', meshB:'rgba(88,86,214,.16)', meshC:'rgba(50,173,230,.12)', meshD:'rgba(255,77,157,.08)' }
+    };
+
+    function setTheme(name){
+      const t = themes[name];
+      if(!t) return;
+      const root = document.documentElement;
+
+      root.style.setProperty('--accent', t.accent);
+      root.style.setProperty('--bg0', t.bg0);
+      root.style.setProperty('--bg1', t.bg1);
+      root.style.setProperty('--cardA', t.cardA);
+      root.style.setProperty('--cardB', t.cardB);
+      root.style.setProperty('--stroke', t.stroke);
+      root.style.setProperty('--stroke2', t.stroke2);
+      root.style.setProperty('--meshA', t.meshA);
+      root.style.setProperty('--meshB', t.meshB);
+      root.style.setProperty('--meshC', t.meshC);
+      root.style.setProperty('--meshD', t.meshD);
+
+      document.querySelectorAll('.theme-switcher button').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`theme-${name}`);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      localStorage.setItem('websiteTheme', name);
+      showToast(`🎨 Tema dəyişdi: ${name}`);
+    }
+
+    function applySavedTheme(){
+      const saved = localStorage.getItem('websiteTheme') || 'pink';
+      setTheme(saved);
+    }
+
+    function bindThemeButtons(){
+      document.querySelectorAll('.theme-switcher button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-theme');
+          if(name) setTheme(name);
+        });
+      });
+    }
+
+    // ===== UI helpers =====
+    let toastTimer = null;
+    function showToast(text){
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    function fmtDateTime(ts){
+      const d = new Date(ts);
+      const pad = (n) => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}  ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function humanCountdown(ms){
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const days = Math.floor(s / 86400);
+      const hours = Math.floor((s % 86400) / 3600);
+      const mins = Math.floor((s % 3600) / 60);
+      const secs = s % 60;
+      return `${days} gün ${hours} saat ${mins} dəq ${secs} san`;
+    }
+
+    // ===== Scroll progress =====
+    function initScrollProgress(){
+      const bar = document.getElementById('scrollBar');
+      if(!bar) return;
+
+      const onScroll = () => {
+        const doc = document.documentElement;
+        const scrollTop = doc.scrollTop || document.body.scrollTop;
+        const height = (doc.scrollHeight - doc.clientHeight) || 1;
+        const pct = Math.min(100, Math.max(0, (scrollTop / height) * 100));
+        bar.style.width = pct.toFixed(2) + '%';
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    // ===== Reveal =====
+    function initReveal(){
+      const els = Array.from(document.querySelectorAll('.reveal'));
+      if(!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('show'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            entry.target.classList.add('show');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el => io.observe(el));
+      // fallback
+      setTimeout(() => els.forEach(el => el.classList.add('show')), 900);
+    }
+
+    // ===== Capsule data =====
+    const KEY = "timeCapsules_v1";
+    let sortAsc = true;
+
+    function loadCapsules(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch(e){ return []; }
+    }
+
+    function saveCapsules(arr){
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+
+    function makeId(){
+      return "c_" + Math.random().toString(16).slice(2) + "_" + Date.now();
+    }
+
+    function getOpenTsFromInputs(){
+      const d = document.getElementById('cDate').value;
+      const t = document.getElementById('cTime').value;
+      if(!d) return null;
+      const time = t ? t : "00:00";
+      const iso = `${d}T${time}:00`;
+      const ts = new Date(iso).getTime();
+      return Number.isFinite(ts) ? ts : null;
+    }
+
+    function setInputsToTs(ts){
+      const d = new Date(ts);
+      const pad = (n) => String(n).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth()+1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mi = pad(d.getMinutes());
+      document.getElementById('cDate').value = `${yyyy}-${mm}-${dd}`;
+      document.getElementById('cTime').value = `${hh}:${mi}`;
+    }
+
+    function addCapsule(c){
+      const arr = loadCapsules();
+      arr.push(c);
+      saveCapsules(arr);
+      render();
+      showToast("📦 Kapsul əlavə olundu");
+    }
+
+    function removeCapsule(id){
+      const arr = loadCapsules().filter(x => x.id !== id);
+      saveCapsules(arr);
+      render();
+      showToast("🗑️ Silindi");
+    }
+
+    function stats(arr){
+      const now = Date.now();
+      const locked = arr.filter(x => x.openAt > now).length;
+      const open = arr.length - locked;
+      document.getElementById('statTotal').textContent = arr.length;
+      document.getElementById('statLocked').textContent = locked;
+      document.getElementById('statOpen').textContent = open;
+    }
+
+    // ===== Modal =====
+    const modal = document.getElementById('modal');
+    const mTitle = document.getElementById('mTitle');
+    const mText = document.getElementById('mText');
+    const close = document.getElementById('close');
+    const copyBtn = document.getElementById('copyBtn');
+    const confetti = document.getElementById('confetti');
+
+    let currentModalText = "";
+    function openModal(title, text){
+      currentModalText = text || "";
+      mTitle.textContent = title || "Kapsul";
+      mText.textContent = text || "";
+      modal.style.display = "block";
+
+      // confetti
+      confetti.innerHTML = "";
+      confetti.classList.add("show");
+      spawnConfetti(26);
+      setTimeout(() => confetti.classList.remove("show"), 900);
+    }
+    function closeModal(){
+      modal.style.display = "none";
+    }
+    close.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+    copyBtn.addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(currentModalText);
+        showToast("📋 Kopyalandı");
+      }catch(e){
+        showToast("Kopyalama alınmadı (browser icazə vermədi)");
+      }
+    });
+
+    function spawnConfetti(n){
+      const colors = [
+        "rgba(255,77,157,.95)",
+        "rgba(61,123,253,.95)",
+        "rgba(47,191,113,.95)",
+        "rgba(255,214,10,.95)",
+        "rgba(255,255,255,.92)"
+      ];
+      for(let i=0;i<n;i++){
+        const p = document.createElement('div');
+        p.className = "piece";
+        p.style.left = (Math.random() * 100) + "%";
+        p.style.top = (-10 - Math.random()*30) + "px";
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.animationDelay = (Math.random()*120) + "ms";
+        p.style.animationDuration = (900 + Math.random()*600) + "ms";
+        confetti.appendChild(p);
+      }
+      setTimeout(() => { confetti.innerHTML = ""; }, 1500);
+    }
+
+    // ===== Render =====
+    function render(){
+      const list = document.getElementById('capsuleList');
+      let arr = loadCapsules();
+
+      arr.sort((a,b) => sortAsc ? (a.openAt - b.openAt) : (b.openAt - a.openAt));
+      stats(arr);
+
+      const now = Date.now();
+      list.innerHTML = "";
+
+      if(arr.length === 0){
+        const empty = document.createElement('div');
+        empty.className = "panel";
+        empty.innerHTML = `
+          <div class="h2">Hələ kapsul yoxdur</div>
+          <p class="p" style="color: var(--muted);">Yuxarıdan bir kapsul əlavə et — tarix gələndə “Aç” düyməsi aktiv olacaq.</p>
+        `;
+        list.appendChild(empty);
+        return;
+      }
+
+      arr.forEach(c => {
+        const locked = c.openAt > now;
+        const wrap = document.createElement('div');
+        wrap.className = "capsule reveal";
+
+        const badge = locked
+          ? `<span class="badge locked">🔒 Kilidli</span>`
+          : `<span class="badge open">🔓 Açıq</span>`;
+
+        const countdown = locked
+          ? `<div class="countdown">Açılma vaxtına: <b>${humanCountdown(c.openAt - now)}</b><div style="color: var(--muted2); margin-top: 6px;">Açılacaq: ${fmtDateTime(c.openAt)}</div></div>`
+          : `<div class="countdown">Açılma tarixi: <b>${fmtDateTime(c.openAt)}</b><div style="color: var(--muted2); margin-top: 6px;">İndi oxuya bilərsən 💌</div></div>`;
+
+        wrap.innerHTML = `
+          <div class="capsule-top">
+            <div>
+              <div class="capsule-title">${escapeHtml(c.title || "Kapsul")}</div>
+              <div class="capsule-meta">Yaradıldı: ${fmtDateTime(c.createdAt)} • ID: ${c.id.slice(-6)}</div>
+            </div>
+            ${badge}
+          </div>
+          <div class="capsule-body">
+            ${countdown}
+            ${
+              locked
+                ? `<div class="open-area" style="filter: blur(6px); opacity:.85;">${escapeHtml((c.text || "").slice(0, 220) || "…")} …</div>`
+                : `<div class="open-area">${escapeHtml(c.text || "")}</div>`
+            }
+            <div class="capsule-actions">
+              ${
+                locked
+                  ? `<button class="btn ghost" type="button" data-act="peek" data-id="${c.id}">👀 Bax (qısa)</button>`
+                  : `<button class="btn btn-primary" type="button" data-act="open" data-id="${c.id}">🔓 Aç (modal)</button>`
+              }
+              <button class="btn btn-danger" type="button" data-act="del" data-id="${c.id}">🗑️ Sil</button>
+            </div>
+          </div>
+        `;
+
+        list.appendChild(wrap);
+      });
+
+      initReveal();
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ===== Events =====
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const title = (document.getElementById('cTitle').value || "").trim();
+      const text = (document.getElementById('cText').value || "").trim();
+      const openAt = getOpenTsFromInputs();
+
+      if(!title || !text){
+        showToast("⚠️ Başlıq və mətn yaz");
+        return;
+      }
+      if(!openAt){
+        showToast("⚠️ Açılma tarixini seç");
+        return;
+      }
+
+      addCapsule({
+        id: makeId(),
+        title,
+        text,
+        createdAt: Date.now(),
+        openAt
+      });
+
+      document.getElementById('cTitle').value = "";
+      document.getElementById('cText').value = "";
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      const ok = confirm("Hamısını silmək istədiyinə əminsən?");
+      if(!ok) return;
+      localStorage.removeItem(KEY);
+      render();
+      showToast("🧹 Sıfırlandı");
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', () => {
+      sortAsc = !sortAsc;
+      showToast(sortAsc ? "⬆️ Köhnə → Yeni" : "⬇️ Yeni → Köhnə");
+      render();
+    });
+
+    document.getElementById('addDemoBtn').addEventListener('click', () => {
+      const now = Date.now();
+      const demo = [
+        { title:"7 gün sonra oxu 💌", text:"Bu mesajı gələcəkdən oxuyursan… Səni yenə də çox sevirəm.", openAt: now + 7*24*3600*1000 },
+        { title:"1 dəqiqə sonra açılacaq 😄", text:"Əgər bunu oxuyursansa, demək vaxt gəlib! ❤️", openAt: now + 60*1000 }
+      ];
+      const arr = loadCapsules();
+      demo.forEach(d => arr.push({ id: makeId(), createdAt: now, ...d }));
+      saveCapsules(arr);
+      render();
+      showToast("✨ Demo əlavə olundu");
+    });
+
+    // Quick buttons
+    document.querySelectorAll('[data-quick]').forEach(b => {
+      b.addEventListener('click', () => {
+        const days = parseInt(b.getAttribute('data-quick'), 10);
+        const ts = Date.now() + days * 24 * 3600 * 1000;
+        setInputsToTs(ts);
+        showToast(`⏱️ ${days} gün seçildi`);
+      });
+    });
+
+    // List delegated actions
+    document.getElementById('capsuleList').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if(!btn) return;
+      const act = btn.getAttribute('data-act');
+      const id = btn.getAttribute('data-id');
+
+      const arr = loadCapsules();
+      const c = arr.find(x => x.id === id);
+      if(!c) return;
+
+      if(act === 'del'){
+        removeCapsule(id);
+        return;
+      }
+      if(act === 'peek'){
+        showToast("🔒 Kilidli — qısa baxış");
+        return;
+      }
+      if(act === 'open'){
+        openModal(c.title, c.text);
+      }
+    });
+
+    // Live countdown update
+    setInterval(() => {
+      // çox ağır olmasın deyə sadə yenilə
+      renderMiniOnly();
+    }, 1000);
+
+    function renderMiniOnly(){
+      // list varsa locked card countdown-ları yenilə (DOM traversal)
+      const now = Date.now();
+      const list = document.getElementById('capsuleList');
+      if(!list || !list.children.length) return;
+
+      // Əgər çox kapsul varsa hər saniyə tam render etməyək
+      // Lock state dəyişəndə (openAt keçəndə) tam render edək
+      const arr = loadCapsules();
+      let needsFull = false;
+      for(const c of arr){
+        if(c.openAt <= now && !c.__openedFlag){
+          // bir dəfə keçid anında full render
+          needsFull = true;
+          break;
+        }
+      }
+      if(needsFull){
+        // flag yazmayaq (persist), sadəcə full render edək
+        render();
+        return;
+      }
+
+      // sadəcə countdown text-ləri yenilə
+      list.querySelectorAll('.capsule').forEach((card, idx) => {
+        const idBtn = card.querySelector('button[data-id]');
+        const id = idBtn ? idBtn.getAttribute('data-id') : null;
+        if(!id) return;
+        const c = arr.find(x => x.id === id);
+        if(!c) return;
+
+        const locked = c.openAt > now;
+        const cd = card.querySelector('.countdown b');
+        if(cd && locked){
+          cd.textContent = humanCountdown(c.openAt - now);
+        }
+      });
+    }
+
+    // ===== Init =====
+    document.addEventListener('DOMContentLoaded', () => {
+      applySavedTheme();
+      bindThemeButtons();
+      initScrollProgress();
+      initReveal();
+
+      // default date/time: sabah 20:00
+      const ts = Date.now() + 24*3600*1000;
+      const d = new Date(ts); d.setHours(20,0,0,0);
+      setInputsToTs(d.getTime());
+
+      render();
+    });
+  </script>
+</body>
+</html>

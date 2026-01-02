@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bucketlist ✨</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent: #ff4d9d;
+      --bg0: #070A12;
+      --bg1: #0B1022;
+
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --cardA: rgba(255,255,255,.10);
+      --cardB: rgba(255,255,255,.06);
+
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+
+      --shadow2: 0 16px 50px rgba(0,0,0,.30);
+
+      --blur: blur(18px);
+      --radius2: 26px;
+
+      --meshA: rgba(255,77,157,.22);
+      --meshB: rgba(61,123,253,.18);
+      --meshC: rgba(47,191,113,.16);
+      --meshD: rgba(255,214,10,.10);
+
+      --safeTop: env(safe-area-inset-top, 0px);
+      --safeBottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 800px at 18% 16%, var(--meshA), transparent 55%),
+        radial-gradient(900px 700px at 86% 20%, var(--meshB), transparent 58%),
+        radial-gradient(900px 650px at 75% 92%, var(--meshC), transparent 60%),
+        radial-gradient(700px 600px at 22% 90%, var(--meshD), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+      transition: filter .35s ease, background .35s ease;
+    }
+    a{ color: inherit; text-decoration:none; }
+
+    .aurora{
+      position: fixed;
+      inset:-30vh -20vw;
+      pointer-events:none;
+      z-index:0;
+      opacity:.72;
+      filter: blur(22px) saturate(1.15);
+      mix-blend-mode: screen;
+    }
+    .aurora::before, .aurora::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        conic-gradient(from 180deg at 40% 40%,
+          rgba(255,77,157,.00),
+          rgba(255,77,157,.32),
+          rgba(50,173,230,.22),
+          rgba(52,199,89,.18),
+          rgba(255,214,10,.14),
+          rgba(255,77,157,.26),
+          rgba(255,77,157,.00)
+        );
+      animation: spin 26s linear infinite;
+      transform-origin: 40% 40%;
+    }
+    .aurora::after{
+      inset: 10% 15%;
+      opacity:.68;
+      animation-duration: 34s;
+      transform-origin: 60% 60%;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    .grain{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:.12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* Reveal */
+    .reveal{ opacity: 1; transform: none; }
+    html.js .reveal{
+      opacity: 0;
+      transform: translateY(10px) scale(.995);
+      transition: opacity .6s ease, transform .7s ease;
+      will-change: opacity, transform;
+    }
+    html.js .reveal.show{ opacity:1; transform: translateY(0) scale(1); }
+
+    /* Theme switcher */
+    .theme-switcher{
+      position: fixed;
+      right: 14px;
+      top: calc(14px + var(--safeTop));
+      z-index: 300;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      display:grid;
+      grid-template-columns: repeat(2, 34px);
+      gap: 8px;
+    }
+    .theme-switcher button{
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.30);
+      cursor:pointer;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .theme-switcher button:hover{
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.55);
+    }
+    .theme-switcher button.active{
+      border-color: rgba(255,255,255,.90);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.10), 0 0 26px rgba(0,0,0,.22);
+      transform: scale(1.06);
+    }
+
+    .app{
+      position: relative;
+      z-index: 3;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safeTop)) 18px calc(28px + var(--safeBottom));
+    }
+
+    .glass{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+    }
+    .glass-inner{ padding: 18px; }
+
+    header{
+      display:flex; flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 900;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      white-space: nowrap;
+    }
+    .back-link:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+
+    h1{
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.0rem, 3.7vw, 2.6rem);
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+      color: rgba(255,255,255,.96);
+    }
+    .subtitle{
+      margin: 8px 0 0;
+      font-family: "Dancing Script", cursive;
+      font-size: 1.35rem;
+      color: var(--muted);
+    }
+
+    .hero{ margin-top: 14px; }
+    .hero .glass-inner{
+      padding: 20px;
+      position: relative;
+    }
+    .hero .glass-inner::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(620px 280px at 20% 22%, rgba(255,77,157,.22), transparent 60%),
+        radial-gradient(620px 280px at 80% 78%, rgba(61,123,253,.18), transparent 60%);
+      opacity: .75;
+      filter: blur(18px);
+      z-index: 0;
+    }
+    .hero .glass-inner > *{ position: relative; z-index: 1; }
+
+    .mini{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: .9rem;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+    .pill b{ color: rgba(255,255,255,.92); }
+
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      box-shadow: 0 18px 54px rgba(0,0,0,.26);
+      padding: 16px;
+    }
+    .h2{
+      margin:0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.35rem;
+      letter-spacing: -0.3px;
+      color: rgba(255,255,255,.95);
+    }
+    .p{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.86);
+      line-height: 1.75;
+    }
+
+    label{
+      display:block;
+      margin-top: 12px;
+      color: var(--muted2);
+      font-size: .92rem;
+      font-weight: 800;
+    }
+    input, textarea, select{
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.92);
+      outline: none;
+      font-family: inherit;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btnrow{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 11px 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease, filter .14s ease;
+      user-select:none;
+      white-space: nowrap;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); box-shadow: 0 16px 40px rgba(0,0,0,.22); }
+    .btn:active{ transform: translateY(0) scale(.99); }
+
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(255,77,157,.40), rgba(255,255,255,.18));
+      border-color: rgba(255,255,255,.18);
+    }
+    .btn-danger{
+      background: rgba(255,77,157,.12);
+      border-color: rgba(255,77,157,.30);
+    }
+    .ghost{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    /* Progress */
+    .progress{
+      margin-top: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.20);
+      overflow:hidden;
+      height: 12px;
+    }
+    .progress > div{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,.85));
+      box-shadow: 0 0 18px rgba(255,77,157,.35);
+      transition: width .35s ease;
+    }
+
+    /* List */
+    .filters{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filters .left{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search{
+      width: min(320px, 100%);
+      border-radius: 999px;
+      padding: 11px 12px;
+    }
+
+    .list{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .item{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 54px rgba(0,0,0,.26);
+      overflow:hidden;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .item:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 24px 70px rgba(0,0,0,.32);
+    }
+
+    .item-row{
+      display:flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 14px;
+    }
+
+    .chk{
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.20);
+      background: rgba(0,0,0,.22);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      flex: 0 0 auto;
+      margin-top: 2px;
+    }
+    .chk i{
+      width: 12px; height: 12px;
+      border-radius: 3px;
+      background: var(--accent);
+      opacity: 0;
+      transform: scale(.7);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .item.done .chk i{ opacity: 1; transform: scale(1); }
+
+    .txt{ flex: 1 1 auto; min-width: 0; }
+    .title{
+      margin:0;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      color: rgba(255,255,255,.95);
+      line-height: 1.35;
+    }
+    .meta{
+      margin-top: 6px;
+      color: var(--muted2);
+      font-size: .88rem;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.88);
+      font-weight: 800;
+      font-size: .84rem;
+      white-space: nowrap;
+    }
+
+    .item.done .title{ opacity: .72; text-decoration: line-through; }
+    .item.done{ opacity: .92; }
+
+    .actions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
+    .iconbtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding: 9px 10px;
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .iconbtn:hover{ transform: translateY(-1px); background: rgba(0,0,0,.35); box-shadow: 0 14px 30px rgba(0,0,0,.22); }
+    .iconbtn:active{ transform: translateY(0) scale(.99); }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(18px + var(--safeBottom));
+      z-index: 5000;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.50);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: rgba(255,255,255,.92);
+      box-shadow: 0 18px 70px rgba(0,0,0,.40);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      font-weight: 800;
+      font-size: .9rem;
+      max-width: min(92vw, 560px);
+      text-align:center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      .theme-switcher{ right: 10px; }
+      .app{ padding-left: 14px; padding-right: 14px; }
+      .row{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>document.documentElement.classList.add('js');</script>
+
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="theme-switcher" aria-label="Tema seçimi">
+    <button id="theme-pink"  data-theme="pink"  title="pink"  style="background: rgba(255,77,157,.95)"></button>
+    <button id="theme-blue"  data-theme="blue"  title="blue"  style="background: rgba(61,123,253,.95)"></button>
+    <button id="theme-green" data-theme="green" title="green" style="background: rgba(47,191,113,.95)"></button>
+    <button id="theme-night" data-theme="night" title="night" style="background: rgba(10,10,20,.95)"></button>
+  </div>
+
+  <div class="app">
+    <div class="glass hero reveal">
+      <div class="glass-inner">
+        <header>
+          <a class="back-link" href="index.html">← Əsas Səhifə</a>
+          <div style="min-width: 240px;">
+            <h1>Birlikdə edəcəyimiz planlar </h1> 
+            <p class="subtitle">Birlikdə edəcəyimiz hər şeyi yazaq — bitəndə işarələ 💗</p>
+          </div>
+        </header>
+
+        <div class="mini">
+          <span class="pill">✅ Bitən: <b id="statDone">0</b></span>
+          <span class="pill">📝 Qalan: <b id="statLeft">0</b></span>
+          <span class="pill">✨ Ümumi: <b id="statAll">0</b></span>
+        </div>
+
+        <div class="progress" aria-label="progress"><div id="progressBar"></div></div>
+
+        <div class="grid">
+          <div class="panel reveal">
+            <div class="h2">Yeni plan əlavə et</div>
+            <p class="p">Qısa yaz: “birlikdə dəniz kənarında gecə gəzintisi”, “kino gecəsi”, “fotosessiya” və s.</p>
+
+            <label for="bText">Plan / məqsəd</label>
+            <input id="bText" type="text" placeholder="Məs: Birlikdə Gün batımına baxaq 🌅"/>
+
+            <div class="row">
+              <div>
+                <label for="bCat">Kateqoriya</label>
+                <select id="bCat">
+                  <option value="Romantik">Romantik</option>
+                  <option value="Səyahət">Səyahət</option>
+                  <option value="Food">Food</option>
+                  <option value="Foto">Foto</option>
+                  <option value="Macəra">Macəra</option>
+                  <option value="Ev">Ev</option>
+                  <option value="Digər">Digər</option>
+                </select>
+              </div>
+              <div>
+                <label for="bPrio">Önəm</label>
+                <select id="bPrio">
+                  <option value="⭐">⭐</option>
+                  <option value="⭐⭐">⭐⭐</option>
+                  <option value="⭐⭐⭐" selected>⭐⭐⭐</option>
+                  <option value="⭐⭐⭐⭐">⭐⭐⭐⭐</option>
+                  <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btnrow">
+              <button class="btn btn-primary" type="button" id="addBtn">➕ Əlavə et</button>
+              <button class="btn btn-danger" type="button" id="resetBtn">🧹 Hamısını sıfırla</button>
+            </div>
+
+            <p class="p" style="color: var(--muted2); margin-top: 12px;">
+              Tips: “⭐” az, “⭐⭐⭐⭐⭐” ən önəmli plan kimi düşün.
+            </p>
+          </div>
+
+          <div class="panel reveal">
+            <div class="h2">Filtrlər</div>
+            <p class="p">Axtarış + kateqoriya + status ilə planları rahat tap.</p>
+
+            <div class="filters">
+              <div class="left">
+                <input id="search" class="search" type="text" placeholder="Axtar… (məs: kino, dəniz, səyahət)">
+                <select id="filterCat" style="width: 210px;">
+                  <option value="ALL">Hamısı</option>
+                  <option value="Romantik">Romantik</option>
+                  <option value="Səyahət">Səyahət</option>
+                  <option value="Food">Food</option>
+                  <option value="Foto">Foto</option>
+                  <option value="Macəra">Macəra</option>
+                  <option value="Ev">Ev</option>
+                  <option value="Digər">Digər</option>
+                </select>
+                <select id="filterStatus" style="width: 180px;">
+                  <option value="ALL">Hamısı</option>
+                  <option value="OPEN">Qalan</option>
+                  <option value="DONE">Bitən</option>
+                </select>
+              </div>
+
+              <div class="btnrow" style="margin-top:0;">
+                <button class="btn ghost" type="button" id="sortBtn">↕️ Sırala</button>
+                <button class="btn ghost" type="button" id="demoBtn">✨ Demo əlavə et</button>
+              </div>
+            </div>
+
+            <p class="p" style="color: var(--muted2); margin-top: 12px;">
+              Sırala düyməsi: “öncə ən önəmli” / “öncə yeni”.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass reveal" style="margin-top: 14px;">
+      <div class="glass-inner">
+        <div class="h2">Plan siyahısı</div>
+        <div class="p" style="margin-top: 6px; color: var(--muted);">
+          Checkbox ilə “bitdi” et. İstəsən “⬆️⬇️” ilə yeri dəyiş. (hamısı localStorage-da qalır)
+        </div>
+
+        <div class="list" id="list"></div>
+
+        <div style="margin-top: 14px; text-align:center; color: var(--muted2); font-size: .9rem;">
+          Hər bitən plan — münasibət üçün yeni “level up” 💗
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script>
+    // ===== Theme =====
+    const themes = {
+      pink:  { accent:'#ff4d9d', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,77,157,.22)', meshB:'rgba(61,123,253,.18)', meshC:'rgba(47,191,113,.16)', meshD:'rgba(255,214,10,.10)' },
+      blue:  { accent:'#3d7bfd', bg0:'#060B16', bg1:'#07162B', cardA:'rgba(210,230,255,.12)', cardB:'rgba(210,230,255,.06)', stroke:'rgba(210,230,255,.16)', stroke2:'rgba(210,230,255,.22)', meshA:'rgba(61,123,253,.24)', meshB:'rgba(50,173,230,.18)', meshC:'rgba(255,77,157,.12)', meshD:'rgba(255,214,10,.08)' },
+      green: { accent:'#2fbf71', bg0:'#06120C', bg1:'#071C12', cardA:'rgba(210,255,230,.12)', cardB:'rgba(210,255,230,.06)', stroke:'rgba(210,255,230,.16)', stroke2:'rgba(210,255,230,.22)', meshA:'rgba(47,191,113,.24)', meshB:'rgba(61,123,253,.12)', meshC:'rgba(255,214,10,.10)', meshD:'rgba(255,77,157,.08)' },
+      night: { accent:'#ffb6c1', bg0:'#05030B', bg1:'#0B0622', cardA:'rgba(255,255,255,.09)', cardB:'rgba(255,255,255,.05)', stroke:'rgba(255,255,255,.11)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,182,193,.18)', meshB:'rgba(88,86,214,.16)', meshC:'rgba(50,173,230,.12)', meshD:'rgba(255,77,157,.08)' }
+    };
+
+    function setTheme(name){
+      const t = themes[name];
+      if(!t) return;
+      const root = document.documentElement;
+
+      root.style.setProperty('--accent', t.accent);
+      root.style.setProperty('--bg0', t.bg0);
+      root.style.setProperty('--bg1', t.bg1);
+      root.style.setProperty('--cardA', t.cardA);
+      root.style.setProperty('--cardB', t.cardB);
+      root.style.setProperty('--stroke', t.stroke);
+      root.style.setProperty('--stroke2', t.stroke2);
+      root.style.setProperty('--meshA', t.meshA);
+      root.style.setProperty('--meshB', t.meshB);
+      root.style.setProperty('--meshC', t.meshC);
+      root.style.setProperty('--meshD', t.meshD);
+
+      document.querySelectorAll('.theme-switcher button').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`theme-${name}`);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      localStorage.setItem('websiteTheme', name);
+      showToast(`🎨 Tema dəyişdi: ${name}`);
+    }
+
+    function applySavedTheme(){
+      const saved = localStorage.getItem('websiteTheme') || 'pink';
+      setTheme(saved);
+    }
+
+    function bindThemeButtons(){
+      document.querySelectorAll('.theme-switcher button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-theme');
+          if(name) setTheme(name);
+        });
+      });
+    }
+
+    // ===== Helpers =====
+    let toastTimer = null;
+    function showToast(text){
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    function initReveal(){
+      const els = Array.from(document.querySelectorAll('.reveal'));
+      if(!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('show'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            entry.target.classList.add('show');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el => io.observe(el));
+      setTimeout(() => els.forEach(el => el.classList.add('show')), 900);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ===== Bucketlist data =====
+    const KEY = "bucketlist_v1";
+    let sortMode = "PRIO"; // PRIO | NEW
+
+    function load(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch(e){ return []; }
+    }
+
+    function save(arr){
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+
+    function makeId(){
+      return "b_" + Math.random().toString(16).slice(2) + "_" + Date.now();
+    }
+
+    function prioScore(p){
+      // ⭐ -> 1, ⭐⭐⭐⭐⭐ -> 5
+      return (String(p).match(/⭐/g) || []).length;
+    }
+
+    function computeStats(arr){
+      const done = arr.filter(x => x.done).length;
+      const all = arr.length;
+      const left = Math.max(0, all - done);
+
+      document.getElementById('statDone').textContent = done;
+      document.getElementById('statLeft').textContent = left;
+      document.getElementById('statAll').textContent = all;
+
+      const pct = all ? Math.round((done / all) * 100) : 0;
+      document.getElementById('progressBar').style.width = pct + "%";
+    }
+
+    function addItem(item){
+      const arr = load();
+      arr.unshift(item);
+      save(arr);
+      render();
+      showToast("➕ Əlavə olundu");
+    }
+
+    function removeItem(id){
+      const arr = load().filter(x => x.id !== id);
+      save(arr);
+      render();
+      showToast("🗑️ Silindi");
+    }
+
+    function toggleDone(id){
+      const arr = load();
+      const it = arr.find(x => x.id === id);
+      if(!it) return;
+      it.done = !it.done;
+      it.doneAt = it.done ? Date.now() : null;
+      save(arr);
+      render();
+      showToast(it.done ? "✅ Bitdi!" : "↩️ Geri qaytarıldı");
+    }
+
+    function moveItem(id, dir){
+      const arr = load();
+      const idx = arr.findIndex(x => x.id === id);
+      if(idx < 0) return;
+      const newIdx = idx + dir;
+      if(newIdx < 0 || newIdx >= arr.length) return;
+      const [sp] = arr.splice(idx, 1);
+      arr.splice(newIdx, 0, sp);
+      save(arr);
+      render();
+      showToast(dir < 0 ? "⬆️ Yuxarı" : "⬇️ Aşağı");
+    }
+
+    function sortItems(arr){
+      const copy = [...arr];
+      if(sortMode === "PRIO"){
+        // öncə tamamlanmamışlar, sonra prioritet yüksək, sonra yeni
+        copy.sort((a,b) => {
+          if(a.done !== b.done) return a.done ? 1 : -1;
+          const pa = prioScore(a.prio), pb = prioScore(b.prio);
+          if(pa !== pb) return pb - pa;
+          return b.createdAt - a.createdAt;
+        });
+      }else{
+        // NEW
+        copy.sort((a,b) => b.createdAt - a.createdAt);
+      }
+      return copy;
+    }
+
+    function passFilters(item, q, cat, status){
+      if(cat !== "ALL" && item.cat !== cat) return false;
+      if(status === "DONE" && !item.done) return false;
+      if(status === "OPEN" && item.done) return false;
+
+      if(q){
+        const s = (item.text + " " + item.cat + " " + item.prio).toLowerCase();
+        if(!s.includes(q)) return false;
+      }
+      return true;
+    }
+
+    function render(){
+      const list = document.getElementById('list');
+      const q = (document.getElementById('search').value || "").trim().toLowerCase();
+      const cat = document.getElementById('filterCat').value;
+      const status = document.getElementById('filterStatus').value;
+
+      let arr = load();
+      computeStats(arr);
+
+      arr = sortItems(arr).filter(it => passFilters(it, q, cat, status));
+
+      list.innerHTML = "";
+      if(arr.length === 0){
+        const empty = document.createElement('div');
+        empty.className = "panel";
+        empty.innerHTML = `
+          <div class="h2">Heç nə tapılmadı</div>
+          <p class="p" style="color: var(--muted);">Filterləri dəyiş və ya yeni plan əlavə et.</p>
+        `;
+        list.appendChild(empty);
+        return;
+      }
+
+      arr.forEach(it => {
+        const card = document.createElement('div');
+        card.className = "item reveal" + (it.done ? " done" : "");
+        card.innerHTML = `
+          <div class="item-row">
+            <div class="chk" data-act="toggle" data-id="${it.id}" title="Bitdi / geri al">
+              <i></i>
+            </div>
+
+            <div class="txt">
+              <div class="title">${escapeHtml(it.text)}</div>
+              <div class="meta">
+                <span class="tag">🏷️ ${escapeHtml(it.cat)}</span>
+                <span class="tag">⭐ ${escapeHtml(it.prio)}</span>
+                <span style="opacity:.9;">${it.done ? "✅ Bitdi" : "📝 Qalır"}</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="iconbtn" type="button" data-act="up" data-id="${it.id}" title="Yuxarı">⬆️</button>
+              <button class="iconbtn" type="button" data-act="down" data-id="${it.id}" title="Aşağı">⬇️</button>
+              <button class="iconbtn" type="button" data-act="del" data-id="${it.id}" title="Sil">🗑️</button>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      initReveal();
+    }
+
+    // ===== Events =====
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const text = (document.getElementById('bText').value || "").trim();
+      const cat = document.getElementById('bCat').value;
+      const prio = document.getElementById('bPrio').value;
+
+      if(!text){
+        showToast("⚠️ Plan yaz");
+        return;
+      }
+
+      addItem({
+        id: makeId(),
+        text,
+        cat,
+        prio,
+        done: false,
+        createdAt: Date.now(),
+        doneAt: null
+      });
+
+      document.getElementById('bText').value = "";
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      const ok = confirm("Hamısını silmək istədiyinə əminsən?");
+      if(!ok) return;
+      localStorage.removeItem(KEY);
+      render();
+      showToast("🧹 Sıfırlandı");
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', () => {
+      sortMode = (sortMode === "PRIO") ? "NEW" : "PRIO";
+      showToast(sortMode === "PRIO" ? "⭐ Önəm + status" : "🆕 Ən yenilər");
+      render();
+    });
+
+    document.getElementById('demoBtn').addEventListener('click', () => {
+      const demo = [
+        { text:"Birlikdə gün batımına baxaq 🌅", cat:"Romantik", prio:"⭐⭐⭐⭐⭐" },
+        { text:"Kino gecəsi + popkorn 🍿", cat:"Ev", prio:"⭐⭐⭐⭐" },
+        { text:"Bir şəhər turu edək 🚶‍♂️🚶‍♀️", cat:"Səyahət", prio:"⭐⭐⭐" },
+        { text:"Birlikdə mini fotosessiya 📸", cat:"Foto", prio:"⭐⭐⭐⭐" },
+      ];
+      const arr = load();
+      demo.forEach(d => arr.unshift({ id: makeId(), done:false, createdAt: Date.now(), doneAt:null, ...d }));
+      save(arr);
+      render();
+      showToast("✨ Demo əlavə olundu");
+    });
+
+    // Live filters
+    ["search","filterCat","filterStatus"].forEach(id => {
+      document.getElementById(id).addEventListener('input', render);
+      document.getElementById(id).addEventListener('change', render);
+    });
+
+    // Delegated list actions
+    document.getElementById('list').addEventListener('click', (e) => {
+      const el = e.target.closest('[data-act]');
+      if(!el) return;
+      const act = el.getAttribute('data-act');
+      const id = el.getAttribute('data-id');
+
+      if(act === "toggle") toggleDone(id);
+      if(act === "del") removeItem(id);
+      if(act === "up") moveItem(id, -1);
+      if(act === "down") moveItem(id, 1);
+    });
+
+    // ===== Theme init =====
+    function bindThemeButtons(){
+      document.querySelectorAll('.theme-switcher button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-theme');
+          if(name) setTheme(name);
+        });
+      });
+    }
+
+    // ===== Init =====
+    document.addEventListener('DOMContentLoaded', () => {
+      applySavedTheme();
+      bindThemeButtons();
+      initReveal();
+      render();
+    });
+  </script>
+</body>
+</html>

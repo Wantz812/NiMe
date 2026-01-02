@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Oyunlar 🎮 | M & N</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent: #ff4d9d;
+
+      --bg0: #070A12;
+      --bg1: #0B1022;
+
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --cardA: rgba(255,255,255,.10);
+      --cardB: rgba(255,255,255,.06);
+
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+
+      --shadow2: 0 16px 50px rgba(0,0,0,.30);
+
+      --blur: blur(18px);
+      --radius2: 26px;
+
+      --meshA: rgba(255,77,157,.22);
+      --meshB: rgba(61,123,253,.18);
+      --meshC: rgba(47,191,113,.16);
+      --meshD: rgba(255,214,10,.10);
+
+      --safeTop: env(safe-area-inset-top, 0px);
+      --safeBottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 800px at 18% 16%, var(--meshA), transparent 55%),
+        radial-gradient(900px 700px at 86% 20%, var(--meshB), transparent 58%),
+        radial-gradient(900px 650px at 75% 92%, var(--meshC), transparent 60%),
+        radial-gradient(700px 600px at 22% 90%, var(--meshD), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+      transition: filter .35s ease, background .35s ease;
+    }
+
+    a{ color: inherit; text-decoration:none; }
+
+    /* Aurora */
+    .aurora{
+      position: fixed;
+      inset:-30vh -20vw;
+      pointer-events:none;
+      z-index:0;
+      opacity:.72;
+      filter: blur(22px) saturate(1.15);
+      mix-blend-mode: screen;
+    }
+    .aurora::before, .aurora::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        conic-gradient(from 180deg at 40% 40%,
+          rgba(255,77,157,.00),
+          rgba(255,77,157,.32),
+          rgba(50,173,230,.22),
+          rgba(52,199,89,.18),
+          rgba(255,214,10,.14),
+          rgba(255,77,157,.26),
+          rgba(255,77,157,.00)
+        );
+      animation: spin 26s linear infinite;
+      transform-origin: 40% 40%;
+    }
+    .aurora::after{
+      inset: 10% 15%;
+      opacity:.68;
+      animation-duration: 34s;
+      transform-origin: 60% 60%;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    /* Grain */
+    .grain{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:.12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(18px + var(--safeBottom));
+      z-index: 5000;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.50);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: rgba(255,255,255,.92);
+      box-shadow: 0 18px 70px rgba(0,0,0,.40);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      font-weight: 800;
+      font-size: .9rem;
+      max-width: min(92vw, 560px);
+      text-align:center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    /* Scroll progress */
+    .scroll-progress{
+      position: fixed;
+      top:0; left:0;
+      width:100%;
+      height: 3px;
+      z-index: 9999;
+      background: rgba(255,255,255,.06);
+    }
+    .scroll-progress-bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,.85));
+      box-shadow: 0 0 18px rgba(255,77,157,.45);
+    }
+
+    /* App */
+    .app{
+      position: relative;
+      z-index: 3;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safeTop)) 18px calc(70px + var(--safeBottom));
+    }
+
+    /* Topbar */
+    .topbar{
+      position: sticky;
+      top: calc(10px + var(--safeTop));
+      z-index: 120;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.3fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 22px;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+    }
+
+    .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
+    .brand-badge{
+      width: 42px; height: 42px; border-radius: 14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow: 0 18px 44px rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .brand-title{ display:flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .brand-title .name{
+      font-family: "Dancing Script", cursive;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: .2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap: 8px;
+      padding: 6px 10px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--muted);
+      font-size: .84rem;
+      width: fit-content;
+    }
+    .chip i{
+      width: 6px; height: 6px; border-radius: 99px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(0,0,0,.25);
+      display:inline-block;
+    }
+
+    .center-actions{ display:flex; align-items:center; justify-content: center; gap: 10px; }
+    .gift-nav-btn{
+      position: relative;
+      display: inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 0;
+      border-radius: 999px;
+      text-decoration:none;
+      font-weight: 900;
+      letter-spacing: .9px;
+      color: #fff;
+      isolation: isolate;
+      transform: translateZ(0);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .gift-nav-btn::before{
+      content:"";
+      position:absolute;
+      inset:-18px;
+      border-radius: inherit;
+      background: conic-gradient(from 180deg,
+        #ff2d55, #ff9f0a, #ffd60a, #34c759, #32ade6, #5856d6, #ff2d55
+      );
+      filter: blur(18px);
+      opacity: .75;
+      z-index: -2;
+    }
+    .gift-nav-btn::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: inherit;
+      background: conic-gradient(from 180deg,
+        #ff2d55, #ff9f0a, #ffd60a, #34c759, #32ade6, #5856d6, #ff2d55
+      );
+      z-index: -1;
+      opacity: .92;
+    }
+    .gift-nav-btn .gift-inner{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.62);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 22px 60px rgba(0,0,0,.35);
+    }
+    .gift-nav-btn:hover{ transform: translateY(-1px) scale(1.03); filter: brightness(1.04); }
+    .gift-nav-btn:active{ transform: translateY(0) scale(.99); }
+
+    .right-actions{ display:flex; justify-content: flex-end; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .nav-link{
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: .86rem;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .nav-link:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+
+    .music-toggle{
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      cursor:pointer;
+      font-weight: 700;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease, border-color .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .music-toggle.off{ color: rgba(255,255,255,.78); background: rgba(255,255,255,.05); }
+    .music-toggle:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+      border-color: var(--stroke2);
+    }
+
+    /* Theme switcher */
+    .theme-switcher{
+      position: fixed;
+      right: 14px;
+      top: calc(14px + var(--safeTop));
+      z-index: 300;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      display:grid;
+      grid-template-columns: repeat(2, 34px);
+      gap: 8px;
+    }
+    .theme-switcher button{
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.30);
+      cursor:pointer;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .theme-switcher button:hover{
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.55);
+    }
+    .theme-switcher button.active{
+      border-color: rgba(255,255,255,.90);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.10), 0 0 26px rgba(0,0,0,.22);
+      transform: scale(1.06);
+    }
+
+    /* Sections */
+    .section{
+      margin-top: 18px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+    }
+    .section .inner{ padding: 20px; }
+
+    .kicker{
+      display:inline-flex; align-items:center; gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--muted);
+      width: fit-content;
+      font-size: .86rem;
+    }
+    .kicker .dot{
+      width: 8px; height: 8px; border-radius: 99px;
+      background: var(--accent);
+      box-shadow: 0 0 14px rgba(0,0,0,.25);
+      display:inline-block;
+    }
+
+    h1{
+      margin: 10px 0 8px;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.0rem, 3.7vw, 2.65rem);
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+    }
+    .lead{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 11px 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease, filter .14s ease;
+      user-select:none;
+      white-space: nowrap;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.06);
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(255,77,157,.40), rgba(255,255,255,.18));
+      color: #fff;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0) scale(.99); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 800;
+      width: fit-content;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+      margin-top: 14px;
+    }
+    .card{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      padding: 16px;
+      overflow: hidden;
+    }
+    .card h3{
+      margin:0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.25rem;
+      letter-spacing: -.2px;
+      color: rgba(255,255,255,.92);
+    }
+    .card p{
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: .96rem;
+    }
+    .card .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      margin-top: 12px;
+    }
+
+    .game-area{
+      margin-top: 12px;
+      min-height: 170px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Heart targets */
+    .heart-target{
+      position: absolute;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,77,157,.85);
+      color: #fff;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.18);
+      user-select:none;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .heart-target:hover{ transform: scale(1.05); filter: brightness(1.05); }
+    .heart-target:active{ transform: scale(.98); }
+
+    /* Quiz */
+    .quiz-options{ margin-top: 10px; display:grid; gap: 8px; }
+    .quiz-options button{ width: 100%; }
+
+    /* Memory */
+    .memory-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .memory-card{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      height: 64px;
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      cursor: pointer;
+      user-select:none;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      transition: transform .12s ease, background .14s ease, border-color .14s ease;
+      color: rgba(255,255,255,.85);
+      font-size: 1.15rem;
+    }
+    .memory-card:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .memory-card.revealed{ background: rgba(255,77,157,.20); color:#fff; }
+    .memory-card.matched{ background: rgba(47,191,113,.18); color: rgba(255,255,255,.95); border-color: rgba(47,191,113,.35); }
+
+    /* Tap Race */
+    .tap-btn{
+      width: 100%;
+      min-height: 92px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(61,123,253,.22), rgba(255,77,157,.18));
+      display:grid;
+      place-items:center;
+      font-weight: 950;
+      letter-spacing: .6px;
+      font-size: 1.05rem;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 20px 60px rgba(0,0,0,.24);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .tap-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .tap-btn:active{ transform: scale(.99); }
+
+    /* Dice */
+    .dice-wrap{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .dice{
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.28);
+      display:grid;
+      place-items:center;
+      font-size: 1.55rem;
+      box-shadow: 0 16px 50px rgba(0,0,0,.22);
+    }
+
+    /* Coin */
+    .coin{
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.24), rgba(0,0,0,.28));
+      display:grid;
+      place-items:center;
+      font-weight: 950;
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+      user-select:none;
+    }
+
+    /* TicTacToe */
+    .ttt{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .ttt button{
+      height: 62px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      font-size: 1.35rem;
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .ttt button:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .ttt button:active{ transform: scale(.99); }
+
+    /* -------------------- SNAKE (BIG + DUO) -------------------- */
+    .snake-card{ grid-column: 1 / -1; padding: 18px; }
+
+    .snake-top{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .avatar{
+      display:flex;
+      gap: 14px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .avatar-preview{
+      width: 78px;
+      height: 78px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      display:grid;
+      place-items:center;
+      font-size: 1.7rem;
+      box-shadow: 0 16px 44px rgba(0,0,0,.22);
+      flex: 0 0 auto;
+      position: relative;
+      overflow:hidden;
+    }
+    .avatar-preview.has-img{
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: transparent;
+    }
+    .avatar-meta{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .avatar-title{
+      font-weight: 950;
+      color: rgba(255,255,255,.92);
+      font-size: 1.02rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .file-btn{ position: relative; overflow:hidden; }
+    .file-btn input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+    .snake-stage{
+      margin-top: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+      position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,.28);
+    }
+    .snake-canvas{
+      width: 100%;
+      height: 520px; /* BIG */
+      display:block;
+    }
+
+    .snake-overlay{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding: 18px;
+      color: rgba(255,255,255,.92);
+      font-weight: 950;
+      letter-spacing: .2px;
+      background: radial-gradient(700px 420px at 50% 10%, rgba(255,77,157,.14), transparent 60%),
+                  rgba(0,0,0,.22);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 1;
+      transition: opacity .25s ease;
+      pointer-events:none;
+    }
+    .snake-overlay.hide{ opacity: 0; }
+
+    .snake-hud{
+      margin-top: 12px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+    }
+    .snake-hud-left, .snake-hud-right{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .snake-slider{
+      flex: 1 1 auto;
+      min-width: 220px;
+      height: 34px;
+      accent-color: var(--accent);
+      background: transparent;
+    }
+
+    .dpad-wrap{
+      margin-top: 12px;
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items:flex-end;
+      justify-content: space-between;
+    }
+
+    .dpad{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      width: min(320px, 100%);
+    }
+    .dpad button{
+      height: 52px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+      user-select:none;
+      font-size: 1.02rem;
+    }
+    .dpad button:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .dpad button:active{ transform: scale(.99); }
+
+    .dpad .empty{ background: transparent; border-color: transparent; cursor: default; }
+    .dpad .empty:hover{ transform:none; background: transparent; }
+
+    .controls-note{
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: .95rem;
+      margin: 0;
+      max-width: 520px;
+    }
+
+    /* Reveal */
+    .reveal{ opacity: 0; transform: translateY(10px) scale(.995); transition: opacity .6s ease, transform .7s ease; }
+    .reveal.show{ opacity: 1; transform: translateY(0) scale(1); }
+
+    @media (max-width: 980px){
+      .topbar{ grid-template-columns: 1fr; }
+      .center-actions{ justify-content:flex-start; }
+      .right-actions{ justify-content:flex-start; }
+      .grid{ grid-template-columns: 1fr; }
+      .theme-switcher{ top: calc(70px + var(--safeTop)); }
+      .snake-top{ grid-template-columns: 1fr; }
+      .snake-canvas{ height: 440px; }
+      .snake-slider{ min-width: 160px; }
+      .dpad-wrap{ justify-content: flex-start; }
+    }
+    @media (max-width: 420px){
+      .memory-grid{ grid-template-columns: repeat(3, 1fr); }
+      .snake-canvas{ height: 400px; }
+      .avatar-preview{ width: 72px; height: 72px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="scroll-progress">
+    <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+  </div>
+
+  <audio id="bg-music" loop
+    src="https://cdn.pixabay.com/download/audio/2022/11/29/audio_9c1c2e7e86.mp3?filename=christmas-music-127502.mp3">
+  </audio>
+
+  <div class="theme-switcher" aria-label="Temanı seç">
+    <button id="theme-pink" style="background:#ff4d9d" onclick="setTheme('pink')" title="Romantik"></button>
+    <button id="theme-blue" style="background:#3d7bfd" onclick="setTheme('blue')" title="Sakit"></button>
+    <button id="theme-green" style="background:#2fbf71" onclick="setTheme('green')" title="Təbiət"></button>
+    <button id="theme-night" style="background:#1b1b2f" onclick="setTheme('night')" title="Gecə"></button>
+  </div>
+
+  <div class="app">
+    <div class="topbar reveal">
+      <div class="brand">
+        <div class="brand-badge">🎮</div>
+        <div class="brand-title">
+          <div class="name">M & N</div>
+          <div class="chip"><i></i> Mini Oyunlar</div>
+        </div>
+      </div>
+
+      <div class="center-actions">
+        <a class="gift-nav-btn" href="gift.html">
+          <span class="gift-inner"><span>🎁</span><span>GIFT</span></span>
+        </a>
+      </div>
+
+      <div class="right-actions">
+        <a class="nav-link" href="index.html">🏠 Əsas</a>
+        <a class="nav-link" href="memories.html">🖼️ Xatirələr</a>
+        <a class="nav-link" href="capsule.html">⏳ Kapsul</a>
+        <a class="nav-link" href="bucketlist.html">✨ Bucket</a>
+        <a class="nav-link" href="puzzle.html">🧩 Puzzle</a>
+
+        <button class="music-toggle off" id="music-toggle-btn" type="button">
+          <span id="music-icon">🔇</span><span id="music-label">Musiqi</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="section reveal">
+      <div class="inner">
+        <div class="kicker"><span class="dot"></span> Əyləncə küncümüz</div>
+        <h1>Mini Oyunlar 🎮</h1>
+        <p class="lead">Burada birlikdə gülmək üçün oyunlar var 💗 (Snake indi tam böyük + duo mod!)</p>
+
+        <div class="row" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="pill">✅ Mobil uyumlu</span>
+          <span class="pill">🎨 Tema dəyişir</span>
+          <span class="pill">🎵 Musiqi yadda qalır</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="inner">
+        <div class="grid">
+
+          <!-- 1) Heart Catch -->
+          <div class="card" id="catch-game">
+            <h3>❤️ Ürək Tutma</h3>
+            <p>20 saniyədə nə qədər ürək tutsan — o qədər “uğur” bizə! 😌</p>
+
+            <div class="game-area" id="heart-area" aria-label="Ürək tutma sahəsi"></div>
+
+            <div class="row">
+              <span class="pill" id="heart-score">0 ürək</span>
+              <span class="pill" id="heart-time">⏱️ 20s</span>
+              <button class="btn btn-primary" type="button" onclick="HeartGame.start()">Başla</button>
+              <button class="btn" type="button" onclick="HeartGame.stop(true)">Dayandır</button>
+            </div>
+          </div>
+
+          <!-- 2) Love Quiz -->
+          <div class="card" id="quiz-game">
+            <h3>✨ Sevgi Quiz</h3>
+            <p id="quiz-question">Sual yüklənir...</p>
+
+            <div class="quiz-options" id="quiz-options"></div>
+
+            <div class="row">
+              <span class="pill" id="quiz-score">0 düzgün</span>
+              <span class="pill" id="quiz-streak">🔥 streak: 0</span>
+              <button class="btn btn-primary" type="button" onclick="Quiz.next()">Növbəti</button>
+              <button class="btn" type="button" onclick="Quiz.reset()">Sıfırla</button>
+            </div>
+          </div>
+
+          <!-- 3) Memory -->
+          <div class="card" id="memory-game">
+            <h3>🧠 Yaddaş Kartları</h3>
+            <p>Hissələri eşlə — xatirələr kimi tamamla 💞</p>
+
+            <div class="memory-grid" id="memory-grid"></div>
+
+            <div class="row">
+              <span class="pill" id="memory-status">0/8 uyğunluq</span>
+              <button class="btn btn-primary" type="button" onclick="MemoryGame.reset()">Yenilə</button>
+            </div>
+          </div>
+
+          <!-- 4) Tap Race -->
+          <div class="card" id="tap-game">
+            <h3>⚡ Tap Race</h3>
+            <p>8 saniyədə mümkün qədər çox klik/tap et. Kim daha sürətlidir? 😄</p>
+
+            <div class="game-area" style="display:grid; place-items:center; padding:14px;">
+              <div style="width:min(520px,100%);">
+                <div class="tap-btn" id="tapBtn" onclick="TapRace.tap()">TAP! 👆</div>
+                <div class="row" style="margin-top:10px;">
+                  <span class="pill" id="tapScore">0 tap</span>
+                  <span class="pill" id="tapTime">⏱️ 8s</span>
+                  <button class="btn btn-primary" type="button" onclick="TapRace.start()">Başla</button>
+                  <button class="btn" type="button" onclick="TapRace.reset()">Sıfırla</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5) Love Dice -->
+          <div class="card" id="dice-game">
+            <h3>🎲 Love Dice</h3>
+            <p>Zar at — nəticəyə görə romantik “tapşırıq” gəlsin 💋</p>
+
+            <div class="dice-wrap">
+              <div class="dice" id="d1">🎲</div>
+              <div class="dice" id="d2">🎲</div>
+              <span class="pill" id="diceSum">Cəm: -</span>
+            </div>
+
+            <div style="margin-top:10px;" class="pill" id="diceTask">Tapşırıq: Zar at 😊</div>
+
+            <div class="row">
+              <button class="btn btn-primary" type="button" onclick="LoveDice.roll()">Zar at</button>
+            </div>
+          </div>
+
+          <!-- 6) Coin Flip -->
+          <div class="card" id="coin-game">
+            <h3>🪙 Coin Flip</h3>
+            <p>Seç: Yazı / Şəkil. Sonra sikkə ataq!</p>
+
+            <div class="row">
+              <button class="btn btn-primary" type="button" onclick="Coin.pick('yazi')">Yazı</button>
+              <button class="btn btn-primary" type="button" onclick="Coin.pick('sekil')">Şəkil</button>
+              <div class="coin" id="coinFace">?</div>
+            </div>
+
+            <div class="row">
+              <span class="pill" id="coinPick">Seçim: -</span>
+              <span class="pill" id="coinResult">Nəticə: -</span>
+              <button class="btn" type="button" onclick="Coin.flip()">At</button>
+            </div>
+          </div>
+
+          <!-- 7) Tic Tac Toe -->
+          <div class="card" id="ttt-game">
+            <h3>❌⭕ Tic Tac Toe</h3>
+            <p>İki nəfərlik (aynı telefonda). Hər turda X/O dəyişir.</p>
+
+            <div class="ttt" id="ttt"></div>
+
+            <div class="row">
+              <span class="pill" id="tttStatus">Növbə: X</span>
+              <span class="pill" id="tttScore">X:0 | O:0</span>
+              <button class="btn btn-primary" type="button" onclick="TTT.reset()">Yenilə</button>
+            </div>
+          </div>
+
+          <!-- 8) Love Snake (BIG + DUO + APPLE IMAGE) -->
+          <div class="card snake-card" id="snake-game">
+            <h3>🐍 Sevgi Snake (BÖYÜK + DUO)</h3>
+            <p>
+              <b>Duo Mode</b> açanda 2 ilan olur 😄 <br/>
+              <b>Player 1 (Sən)</b>: WASD | <b>Player 2 (Sevgilin)</b>: Ox düymələri + ekrandakı yön düymələri <br/>
+              ✅ <b>Almanı da şəkil kimi dəyişə bilərsən</b> (aşağıdan seç)
+            </p>
+
+            <div class="snake-top">
+              <div class="avatar">
+                <div class="avatar-preview" id="p2Preview">💖</div>
+                <div class="avatar-meta">
+                  <div class="avatar-title">Player 2 (Sevgilim) — ilan başı 💖</div>
+                  <label class="btn btn-primary file-btn">
+                    Şəkil seç
+                    <input type="file" accept="image/*" id="p2ImgInput" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="avatar">
+                <div class="avatar-preview" id="p1Preview">😎</div>
+                <div class="avatar-meta">
+                  <div class="avatar-title">Player 1 (Mən) — ilan başı 😎</div>
+                  <label class="btn btn-primary file-btn">
+                    Şəkil seç
+                    <input type="file" accept="image/*" id="p1ImgInput" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="avatar">
+                <div class="avatar-preview" id="applePreview">🍎</div>
+                <div class="avatar-meta">
+                  <div class="avatar-title">🍎 Alma şəkli (istəsən dəyiş)</div>
+                  <label class="btn btn-primary file-btn">
+                    Şəkil seç
+                    <input type="file" accept="image/*" id="appleImgInput" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="snake-stage">
+              <canvas id="snakeCanvas" class="snake-canvas"></canvas>
+              <div class="snake-overlay" id="snakeOverlay">
+                Başla düyməsinə bas ✨<br/>
+                <span style="opacity:.85;font-weight:800;">
+                  Solo: 1 ilan | Duo: 2 ilan (WASD + Ox)
+                </span>
+              </div>
+            </div>
+
+            <div class="snake-hud">
+              <div class="snake-hud-left">
+                <span class="pill" id="p1Score">😎 0</span>
+                <span class="pill" id="p2Score">💖 0</span>
+                <span class="pill" id="snakeBest">🏆 0</span>
+              </div>
+
+              <div class="snake-hud-right">
+                <span class="pill" id="snakeSpeedLabel">⚡ 8</span>
+                <input type="range" id="snakeSpeed" min="6" max="16" value="9" class="snake-slider" />
+                <button class="btn" type="button" onclick="SnakeGame.toggleWrap()" id="snakeWrapBtn">🧱 Divar: Açıq</button>
+                <button class="btn btn-primary" type="button" onclick="SnakeGame.toggleDuo()" id="duoBtn">👥 Duo: Söndür</button>
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn btn-primary" type="button" onclick="SnakeGame.start()">Başla</button>
+              <button class="btn" type="button" onclick="SnakeGame.pause()">Pauza</button>
+              <button class="btn" type="button" onclick="SnakeGame.reset()">Yenidən</button>
+            </div>
+
+            <div class="dpad-wrap">
+              <div class="dpad" aria-label="Player 2 yön düymələri (oxlar)">
+                <button class="empty" type="button"></button>
+                <button type="button" onclick="SnakeGame.setDirP2('up')">⬆ (P2)</button>
+                <button class="empty" type="button"></button>
+                <button type="button" onclick="SnakeGame.setDirP2('left')">⬅ (P2)</button>
+                <button type="button" onclick="SnakeGame.setDirP2('down')">⬇ (P2)</button>
+                <button type="button" onclick="SnakeGame.setDirP2('right')">➡ (P2)</button>
+              </div>
+
+              <p class="controls-note">
+                ✅ <b>Solo</b>: sadəcə P1 oynayır (WASD). <br/>
+                ✅ <b>Duo</b>: P1 (WASD), P2 (Oxlar / ekrandakı düymələr). <br/>
+                ⚠️ Bir-birinizə dəyəndə oyun bitir 😄
+              </p>
+            </div>
+
+            <div class="pill" id="snakeMission">🎯 Məqsəd: 15 alma (Duo-da kim 15-ə çatarsa qalib)</div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:14px; color:var(--muted2); line-height:1.7;">
+          İstəsən, digər oyunlara da “couple challenge” sistemi əlavə edərik 💗
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // -------------------- Helpers --------------------
+    let toastTimer = null;
+    function showToast(text){
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    // Scroll progress
+    const progressBar = document.getElementById('scroll-progress-bar');
+    function handleScroll(){
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      if(progressBar) progressBar.style.width = scrolled + '%';
+    }
+    window.addEventListener('scroll', handleScroll, { passive:true });
+    handleScroll();
+
+    // Reveal
+    setTimeout(() => {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('show'));
+    }, 120);
+
+    // -------------------- Theme --------------------
+    const themes = {
+      pink:  { accent:'#ff4d9d', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,77,157,.24)', meshB:'rgba(61,123,253,.16)', meshC:'rgba(47,191,113,.14)', meshD:'rgba(255,214,10,.10)' },
+      blue:  { accent:'#3d7bfd', bg0:'#060B16', bg1:'#07162B', cardA:'rgba(210,230,255,.12)', cardB:'rgba(210,230,255,.06)', stroke:'rgba(210,230,255,.16)', stroke2:'rgba(210,230,255,.22)', meshA:'rgba(61,123,253,.24)', meshB:'rgba(50,173,230,.18)', meshC:'rgba(47,191,113,.10)', meshD:'rgba(255,77,157,.08)' },
+      green: { accent:'#2fbf71', bg0:'#06120C', bg1:'#071C12', cardA:'rgba(210,255,230,.12)', cardB:'rgba(210,255,230,.06)', stroke:'rgba(210,255,230,.16)', stroke2:'rgba(210,255,230,.22)', meshA:'rgba(47,191,113,.24)', meshB:'rgba(61,123,253,.12)', meshC:'rgba(255,214,10,.10)', meshD:'rgba(255,77,157,.08)' },
+      night: { accent:'#ffb6c1', bg0:'#05030B', bg1:'#0B0622', cardA:'rgba(255,255,255,.09)', cardB:'rgba(255,255,255,.05)', stroke:'rgba(255,255,255,.11)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,182,193,.18)', meshB:'rgba(88,86,214,.16)', meshC:'rgba(50,173,230,.12)', meshD:'rgba(255,77,157,.08)' }
+    };
+
+    function setTheme(name){
+      const t = themes[name];
+      if(!t) return;
+      const root = document.documentElement;
+
+      root.style.setProperty('--accent', t.accent);
+      root.style.setProperty('--bg0', t.bg0);
+      root.style.setProperty('--bg1', t.bg1);
+      root.style.setProperty('--cardA', t.cardA);
+      root.style.setProperty('--cardB', t.cardB);
+      root.style.setProperty('--stroke', t.stroke);
+      root.style.setProperty('--stroke2', t.stroke2);
+      root.style.setProperty('--meshA', t.meshA);
+      root.style.setProperty('--meshB', t.meshB);
+      root.style.setProperty('--meshC', t.meshC);
+      root.style.setProperty('--meshD', t.meshD);
+
+      document.querySelectorAll('.theme-switcher button').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`theme-${name}`);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      localStorage.setItem('websiteTheme', name);
+      showToast(`🎨 Tema: ${name}`);
+      try{ SnakeGame.redraw(); }catch(_){}
+    }
+    const savedTheme = localStorage.getItem('websiteTheme') || 'pink';
+    setTheme(savedTheme);
+
+    // -------------------- Music --------------------
+    const music = document.getElementById('bg-music');
+    const musicToggleBtn = document.getElementById('music-toggle-btn');
+    const musicIcon = document.getElementById('music-icon');
+    const musicLabel = document.getElementById('music-label');
+    let musicOn = localStorage.getItem('musicOn') === 'true';
+
+    function updateMusicUI(isOn){
+      if(!musicToggleBtn || !musicIcon || !musicLabel) return;
+      if(isOn){
+        musicToggleBtn.classList.remove('off');
+        musicIcon.textContent = '🎵';
+        musicLabel.textContent = 'Səslə';
+      }else{
+        musicToggleBtn.classList.add('off');
+        musicIcon.textContent = '🔇';
+        musicLabel.textContent = 'Səssiz';
+      }
+    }
+    updateMusicUI(musicOn);
+    if(music && musicOn){ music.play().catch(()=>{}); }
+
+    if(musicToggleBtn){
+      musicToggleBtn.addEventListener('click', () => {
+        musicOn = !musicOn;
+        localStorage.setItem('musicOn', musicOn ? 'true' : 'false');
+        updateMusicUI(musicOn);
+        if(music && musicOn){ music.play().catch(()=>{}); showToast("🎵 Musiqi açıldı"); }
+        if(music && !musicOn){ music.pause(); showToast("🔇 Musiqi söndü"); }
+      });
+    }
+
+    // -------------------- 1) Heart Catch --------------------
+    const HeartGame = (() => {
+      const area = document.getElementById('heart-area');
+      const scoreEl = document.getElementById('heart-score');
+      const timeEl = document.getElementById('heart-time');
+
+      let score = 0;
+      let timeLeft = 20;
+      let timer = null;
+      let spawner = null;
+
+      function resetUI(){
+        if(area) area.innerHTML = '';
+        if(scoreEl) scoreEl.textContent = `${score} ürək`;
+        if(timeEl) timeEl.textContent = `⏱️ ${timeLeft}s`;
+      }
+
+      function spawn(){
+        if(!area) return;
+        const heart = document.createElement('div');
+        heart.className = 'heart-target';
+        heart.textContent = '❤';
+
+        const rect = area.getBoundingClientRect();
+        const size = 38;
+        const x = Math.random() * Math.max(0, rect.width - size);
+        const y = Math.random() * Math.max(0, rect.height - size);
+
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+
+        heart.addEventListener('click', () => {
+          score++;
+          if(scoreEl) scoreEl.textContent = `${score} ürək`;
+          heart.remove();
+        });
+
+        area.appendChild(heart);
+        setTimeout(() => heart.remove(), 1400);
+      }
+
+      function tick(){
+        timeLeft--;
+        if(timeEl) timeEl.textContent = `⏱️ ${timeLeft}s`;
+        if(timeLeft <= 0){
+          stop();
+          alert(`Bitdi! ${score} ürək topladın ❤️`);
+          showToast(`❤️ ${score} ürək`);
+        }
+      }
+
+      function start(){
+        if(timer || spawner) return;
+        score = 0;
+        timeLeft = 20;
+        resetUI();
+
+        spawner = setInterval(spawn, 520);
+        timer = setInterval(tick, 1000);
+        showToast("❤️ Başladı!");
+      }
+
+      function stop(silent=false){
+        clearInterval(spawner); clearInterval(timer);
+        spawner = null; timer = null;
+        if(!silent) showToast("⏸️ Dayandı");
+      }
+
+      return { start, stop };
+    })();
+    window.HeartGame = HeartGame;
+
+    // -------------------- 2) Quiz --------------------
+    const Quiz = (() => {
+      const qEl = document.getElementById('quiz-question');
+      const optionsEl = document.getElementById('quiz-options');
+      const scoreEl = document.getElementById('quiz-score');
+      const streakEl = document.getElementById('quiz-streak');
+
+      const data = [
+        { q: "Ən şirin planımız hansıdır?", options: ["Film + isti çay", "Yeni yer kəşfi", "Uzun gəzinti"], a: 0 },
+        { q: "Sən gələndə mənim moodum necə olur?", options: ["Normal", "Super", "Partlayış 💥"], a: 2 },
+        { q: "Sevgi dili:?", options: ["Qayğı", "Söz", "Hamısı"], a: 2 },
+        { q: "Mənim üçün ən gözəl mesaj:", options: ["'hardasan?'", "'darıxdım'", "'gəl'"], a: 1 },
+        { q: "Bizim vibe:", options: ["Romantik", "Gülməli", "Romantik + gülməli"], a: 2 },
+        { q: "Ən güclü silahın:", options: ["Gözlərin", "Gülüşün", "Qəlbin"], a: 1 },
+        { q: "Bu saytda ən 'wow' hiss:", options: ["Tema", "Oyunlar", "Hər şey"], a: 2 },
+        { q: "Sənə görə ən yaxşı hədiyyə:", options: ["Vaxt", "Diqqət", "Hər ikisi"], a: 2 }
+      ];
+
+      let idx = 0;
+      let score = 0;
+      let streak = 0;
+
+      function render(){
+        if(!qEl || !optionsEl) return;
+        const item = data[idx];
+        qEl.textContent = item.q;
+        optionsEl.innerHTML = '';
+
+        item.options.forEach((txt, i) => {
+          const b = document.createElement('button');
+          b.className = 'btn btn-primary';
+          b.type = 'button';
+          b.textContent = txt;
+          b.onclick = () => pick(i);
+          optionsEl.appendChild(b);
+        });
+
+        if(scoreEl) scoreEl.textContent = `${score} düzgün`;
+        if(streakEl) streakEl.textContent = `🔥 streak: ${streak}`;
+      }
+
+      function pick(i){
+        const item = data[idx];
+        if(i === item.a){
+          score++;
+          streak++;
+          showToast("✅ Düzgün!");
+        }else{
+          streak = 0;
+          showToast("❌ Olmadı 😄");
+        }
+        next();
+      }
+
+      function next(){
+        idx = (idx + 1) % data.length;
+        render();
+      }
+
+      function reset(){
+        idx = 0; score = 0; streak = 0;
+        render();
+        showToast("🔁 Quiz sıfırlandı");
+      }
+
+      return { render, next, reset };
+    })();
+    window.Quiz = Quiz;
+
+    // -------------------- 3) Memory --------------------
+    const MemoryGame = (() => {
+      const grid = document.getElementById('memory-grid');
+      const status = document.getElementById('memory-status');
+
+      const iconsBase = ['🌸','💎','🌙','🍯','🎀','🧩','🎮','💗'];
+      let icons = [];
+      let first = null;
+      let lock = false;
+      let matched = 0;
+
+      function shuffle(a){
+        for(let i=a.length-1;i>0;i--){
+          const j = Math.floor(Math.random()*(i+1));
+          [a[i],a[j]] = [a[j],a[i]];
+        }
+      }
+
+      function setStatus(){
+        if(status) status.textContent = `${matched}/8 uyğunluq`;
+      }
+
+      function build(){
+        if(!grid) return;
+        grid.innerHTML = '';
+        matched = 0;
+        first = null;
+        lock = false;
+
+        icons = [...iconsBase, ...iconsBase];
+        shuffle(icons);
+
+        icons.forEach((ic, i) => {
+          const c = document.createElement('div');
+          c.className = 'memory-card';
+          c.textContent = '❓';
+          c.dataset.icon = ic;
+          c.dataset.i = String(i);
+          c.addEventListener('click', () => click(c));
+          grid.appendChild(c);
+        });
+
+        setStatus();
+      }
+
+      function click(card){
+        if(lock || card.classList.contains('matched') || card === first) return;
+
+        card.classList.add('revealed');
+        card.textContent = card.dataset.icon;
+
+        if(!first){ first = card; return; }
+
+        lock = true;
+        const same = first.dataset.icon === card.dataset.icon;
+
+        if(same){
+          first.classList.add('matched');
+          card.classList.add('matched');
+          matched++;
+          setStatus();
+          first = null;
+          lock = false;
+          if(matched === 8) showToast("🏁 Hamısı tapıldı!");
+        }else{
+          setTimeout(() => {
+            first.classList.remove('revealed');
+            card.classList.remove('revealed');
+            first.textContent = '❓';
+            card.textContent = '❓';
+            first = null;
+            lock = false;
+          }, 650);
+        }
+      }
+
+      function reset(){ build(); showToast("🧠 Yeniləndi"); }
+
+      return { build, reset };
+    })();
+    window.MemoryGame = MemoryGame;
+
+    // -------------------- 4) Tap Race --------------------
+    const TapRace = (() => {
+      const btn = document.getElementById('tapBtn');
+      const scoreEl = document.getElementById('tapScore');
+      const timeEl = document.getElementById('tapTime');
+
+      let score = 0;
+      let timeLeft = 8;
+      let running = false;
+      let timer = null;
+
+      function update(){
+        if(scoreEl) scoreEl.textContent = `${score} tap`;
+        if(timeEl) timeEl.textContent = `⏱️ ${timeLeft}s`;
+      }
+
+      function start(){
+        if(running) return;
+        running = true;
+        score = 0;
+        timeLeft = 8;
+        update();
+        showToast("⚡ Başla!");
+
+        timer = setInterval(() => {
+          timeLeft--;
+          update();
+          if(timeLeft <= 0){
+            clearInterval(timer);
+            timer = null;
+            running = false;
+            showToast(`🏁 ${score} tap!`);
+            alert(`Bitdi! ${score} tap etdin ⚡`);
+          }
+        }, 1000);
+      }
+
+      function tap(){
+        if(!running) return;
+        score++;
+        update();
+        if(btn){
+          btn.style.transform = 'scale(.99)';
+          setTimeout(() => btn.style.transform = '', 80);
+        }
+      }
+
+      function reset(){
+        clearInterval(timer);
+        timer = null;
+        running = false;
+        score = 0;
+        timeLeft = 8;
+        update();
+        showToast("🔁 Sıfırlandı");
+      }
+
+      update();
+      return { start, tap, reset };
+    })();
+    window.TapRace = TapRace;
+
+    // -------------------- 5) Love Dice --------------------
+    const LoveDice = (() => {
+      const d1 = document.getElementById('d1');
+      const d2 = document.getElementById('d2');
+      const sumEl = document.getElementById('diceSum');
+      const taskEl = document.getElementById('diceTask');
+
+      const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+      const tasks = {
+        2: "2: 10 saniyə gözlərinə bax 💗",
+        3: "3: 1 kompliment de 😌",
+        4: "4: 'darıxdım' yaz 😄",
+        5: "5: 1 emoji ilə halını anlat 😎",
+        6: "6: 1 'mini plan' qur (məs: gəzinti)",
+        7: "7: 1 sirr paylaş 🤫",
+        8: "8: 3 dəfə 'balam' de 😂",
+        9: "9: 1 şirin söz yaz ✨",
+        10:"10: 1 foto seçib xatirə de 📸",
+        11:"11: 1 mahnı tövsiyə et 🎵",
+        12:"12: 1 öpüş göndər 💋"
+      };
+
+      function roll(){
+        const a = Math.floor(Math.random()*6)+1;
+        const b = Math.floor(Math.random()*6)+1;
+
+        if(d1) d1.textContent = faces[a-1];
+        if(d2) d2.textContent = faces[b-1];
+
+        const s = a+b;
+        if(sumEl) sumEl.textContent = `Cəm: ${s}`;
+        if(taskEl) taskEl.textContent = `Tapşırıq: ${tasks[s] || "Gül 😄"}`;
+        showToast("🎲 Zar atıldı!");
+      }
+
+      return { roll };
+    })();
+    window.LoveDice = LoveDice;
+
+    // -------------------- 6) Coin Flip --------------------
+    const Coin = (() => {
+      const pickEl = document.getElementById('coinPick');
+      const resEl = document.getElementById('coinResult');
+      const faceEl = document.getElementById('coinFace');
+
+      let pick = null;
+
+      function setPick(p){
+        pick = p;
+        if(pickEl) pickEl.textContent = `Seçim: ${p === 'yazi' ? 'Yazı' : 'Şəkil'}`;
+        showToast("✅ Seçildi");
+      }
+
+      function flip(){
+        if(!pick){
+          showToast("Əvvəl seçim et 😄");
+          return;
+        }
+        const r = Math.random() < 0.5 ? 'yazi' : 'sekil';
+        if(faceEl) faceEl.textContent = r === 'yazi' ? 'Y' : 'S';
+        if(resEl) resEl.textContent = `Nəticə: ${r === 'yazi' ? 'Yazı' : 'Şəkil'}`;
+
+        const win = r === pick;
+        showToast(win ? "🎉 Düz tapdın!" : "😄 Səhv oldu");
+      }
+
+      return { pick: setPick, flip };
+    })();
+    window.Coin = Coin;
+
+    // -------------------- 7) Tic Tac Toe --------------------
+    const TTT = (() => {
+      const wrap = document.getElementById('ttt');
+      const statusEl = document.getElementById('tttStatus');
+      const scoreEl = document.getElementById('tttScore');
+
+      let board = Array(9).fill('');
+      let turn = 'X';
+      let locked = false;
+      let scoreX = 0, scoreO = 0;
+
+      function render(){
+        if(!wrap) return;
+        wrap.innerHTML = '';
+        board.forEach((v, i) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = v || '';
+          b.onclick = () => play(i);
+          wrap.appendChild(b);
+        });
+        if(statusEl) statusEl.textContent = locked ? "Tur bitdi" : `Növbə: ${turn}`;
+        if(scoreEl) scoreEl.textContent = `X:${scoreX} | O:${scoreO}`;
+      }
+
+      function lines(){
+        return [
+          [0,1,2],[3,4,5],[6,7,8],
+          [0,3,6],[1,4,7],[2,5,8],
+          [0,4,8],[2,4,6]
+        ];
+      }
+
+      function winner(){
+        for(const [a,b,c] of lines()){
+          if(board[a] && board[a] === board[b] && board[b] === board[c]) return board[a];
+        }
+        return null;
+      }
+
+      function play(i){
+        if(locked || board[i]) return;
+        board[i] = turn;
+        const w = winner();
+        if(w){
+          locked = true;
+          if(w === 'X') scoreX++; else scoreO++;
+          showToast(`🏆 Qazanan: ${w}`);
+          render();
+          return;
+        }
+        if(board.every(Boolean)){
+          locked = true;
+          showToast("🤝 Heç-heçə");
+          render();
+          return;
+        }
+        turn = (turn === 'X') ? 'O' : 'X';
+        render();
+      }
+
+      function reset(){
+        board = Array(9).fill('');
+        turn = (Math.random() < 0.5) ? 'X' : 'O';
+        locked = false;
+        render();
+        showToast("🔁 Yeniləndi");
+      }
+
+      render();
+      return { reset };
+    })();
+    window.TTT = TTT;
+
+    // -------------------- 8) LOVE SNAKE (BIG + DUO + APPLE IMAGE) --------------------
+    const SnakeGame = (() => {
+      const STORE_P1_IMG   = "loveSnake_p1Img_v2";
+      const STORE_P2_IMG   = "loveSnake_p2Img_v2";
+      const STORE_APPLE_IMG= "loveSnake_appleImg_v2";
+      const STORE_BEST     = "loveSnake_best_v2";
+      const STORE_WRAP     = "loveSnake_wrap_v2";
+      const STORE_DUO      = "loveSnake_duo_v2";
+
+      const canvas  = document.getElementById("snakeCanvas");
+      const overlay = document.getElementById("snakeOverlay");
+
+      const p1Preview   = document.getElementById("p1Preview");
+      const p2Preview   = document.getElementById("p2Preview");
+      const applePreview= document.getElementById("applePreview");
+
+      const p1Input    = document.getElementById("p1ImgInput");
+      const p2Input    = document.getElementById("p2ImgInput");
+      const appleInput = document.getElementById("appleImgInput");
+
+      const p1ScoreEl = document.getElementById("p1Score");
+      const p2ScoreEl = document.getElementById("p2Score");
+      const bestEl    = document.getElementById("snakeBest");
+      const speedEl   = document.getElementById("snakeSpeed");
+      const speedLabel= document.getElementById("snakeSpeedLabel");
+      const wrapBtn   = document.getElementById("snakeWrapBtn");
+      const missionEl = document.getElementById("snakeMission");
+      const duoBtn    = document.getElementById("duoBtn");
+
+      let ctx = null;
+      let dpr = 1;
+
+      // board config
+      let cell = 22;
+      let cols = 0;
+      let rows = 0;
+
+      // state
+      let duo = false;
+      let wrapWalls = true;
+
+      let running = false;
+      let timer = null;
+
+      // players
+      let p1 = { snake: [], dir:{x:1,y:0}, next:{x:1,y:0}, score:0 };
+      let p2 = { snake: [], dir:{x:-1,y:0}, next:{x:-1,y:0}, score:0 };
+
+      let apple = {x: 6, y: 6};
+
+      let best = 0;
+
+      // images
+      const imgP1 = new Image();
+      const imgP2 = new Image();
+      const imgApple = new Image();
+      let p1Ready = false;
+      let p2Ready = false;
+      let appleReady = false;
+
+      // touch
+      let touchStart = null;
+
+      function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+      function setOverlay(html, show=true){
+        if(!overlay) return;
+        overlay.innerHTML = html;
+        if(show) overlay.classList.remove("hide");
+        else overlay.classList.add("hide");
+      }
+
+      function fitCanvas(){
+        if(!canvas) return;
+        if(!ctx) ctx = canvas.getContext("2d");
+
+        const rect = canvas.getBoundingClientRect();
+        dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+
+        canvas.width  = Math.max(1, Math.floor(rect.width  * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale(dpr, dpr);
+
+        const w = rect.width;
+        const h = rect.height;
+
+        const targetCols = w >= 900 ? 34 : 26;
+        cell = Math.max(18, Math.min(30, Math.floor(w / targetCols)));
+        cols = Math.max(18, Math.floor(w / cell));
+        rows = Math.max(14, Math.floor(h / cell));
+      }
+
+      function randInt(n){ return Math.floor(Math.random() * n); }
+      function key(x,y){ return `${x},${y}`; }
+      function eq(a,b){ return a.x===b.x && a.y===b.y; }
+
+      function spawnApple(){
+        const taken = new Set();
+        for(const s of p1.snake) taken.add(key(s.x,s.y));
+        for(const s of p2.snake) taken.add(key(s.x,s.y));
+
+        let tries = 0;
+        let pt;
+        do{
+          pt = {x: randInt(cols), y: randInt(rows)};
+          tries++;
+          if(tries > 400) break;
+        }while(taken.has(key(pt.x,pt.y)));
+
+        apple = pt;
+      }
+
+      function setSpeedLabel(){
+        if(speedLabel) speedLabel.textContent = `⚡ ${getSpeed()}`;
+        if(running){
+          stopLoop();
+          startLoop();
+        }
+      }
+      function getSpeed(){
+        const v = Number(speedEl?.value || 9);
+        return Math.max(6, Math.min(16, v));
+      }
+
+      function updateUI(){
+        if(p1ScoreEl) p1ScoreEl.textContent = `😎 ${p1.score}`;
+        if(p2ScoreEl) p2ScoreEl.textContent = `💖 ${p2.score}`;
+        if(bestEl) bestEl.textContent = `🏆 ${best}`;
+        if(speedLabel) speedLabel.textContent = `⚡ ${getSpeed()}`;
+        if(wrapBtn) wrapBtn.textContent = wrapWalls ? "🧱 Divar: Açıq" : "🌀 Divar: Wrap";
+        if(duoBtn) duoBtn.textContent = duo ? "👥 Duo: Açıq" : "👥 Duo: Söndür";
+
+        const goal = 15;
+        if(missionEl){
+          if(duo){
+            const left1 = Math.max(0, goal - p1.score);
+            const left2 = Math.max(0, goal - p2.score);
+            missionEl.textContent = `🎯 Məqsəd: ${goal} alma — P1 qaldı: ${left1} | P2 qaldı: ${left2}`;
+          }else{
+            const left = Math.max(0, goal - p1.score);
+            missionEl.textContent = left===0 ? "🎯 Məqsəd tamamlandı! 💗" : `🎯 Məqsəd: ${goal} alma (qaldı: ${left})`;
+          }
+        }
+      }
+
+      function canChange(cur, nd){
+        if(nd.x === -cur.x && nd.y === -cur.y) return false;
+        return true;
+      }
+
+      function setDirP1(name){
+        const map = { up:{x:0,y:-1}, down:{x:0,y:1}, left:{x:-1,y:0}, right:{x:1,y:0} };
+        const nd = map[name]; if(!nd) return;
+        if(canChange(p1.dir, nd)) p1.next = nd;
+      }
+      function setDirP2(name){
+        const map = { up:{x:0,y:-1}, down:{x:0,y:1}, left:{x:-1,y:0}, right:{x:1,y:0} };
+        const nd = map[name]; if(!nd) return;
+        if(canChange(p2.dir, nd)) p2.next = nd;
+      }
+
+      function initState(){
+        fitCanvas();
+
+        p1.score = 0; p2.score = 0;
+
+        const y1 = Math.floor(rows/2);
+        const x1 = Math.floor(cols/2) - 4;
+
+        p1.dir = {x:1,y:0}; p1.next = {x:1,y:0};
+        p1.snake = [
+          {x:x1, y:y1},
+          {x:x1-1, y:y1},
+          {x:x1-2, y:y1},
+          {x:x1-3, y:y1},
+        ];
+
+        const y2 = Math.floor(rows/2);
+        const x2 = Math.floor(cols/2) + 4;
+
+        p2.dir = {x:-1,y:0}; p2.next = {x:-1,y:0};
+        p2.snake = [
+          {x:x2, y:y2},
+          {x:x2+1, y:y2},
+          {x:x2+2, y:y2},
+          {x:x2+3, y:y2},
+        ];
+
+        spawnApple();
+        updateUI();
+        draw();
+        setOverlay(`Başla düyməsinə bas ✨<br/><span style="opacity:.85;font-weight:800;">${duo ? "Duo: WASD + Ox" : "Solo: WASD"}</span>`, true);
+      }
+
+      function gameOver(reason){
+        pause(true);
+        setOverlay(`💥 Oyun bitdi 😄<br/><b>${reason}</b><br/><span style="opacity:.85;font-weight:800;">“Yenidən” bas</span>`, true);
+        showToast("💥 Game Over!");
+      }
+
+      function winnerCheck(){
+        const goal = 15;
+        if(!duo && p1.score >= goal){
+          pause(true);
+          setOverlay(`🎉 QAZANDIN! 💗<br/>Score: <b>${p1.score}</b><br/><span style="opacity:.85;font-weight:800;">Yenidən oynamaq üçün “Yenidən”</span>`, true);
+          showToast("🎉 Məqsəd tamam!");
+          return true;
+        }
+        if(duo){
+          if(p1.score >= goal){
+            pause(true);
+            setOverlay(`🏆 QALİB: <b>P1 (Sən)</b> 😎<br/>P1: ${p1.score} | P2: ${p2.score}<br/><span style="opacity:.85;font-weight:800;">Yenidən: “Yenidən”</span>`, true);
+            showToast("🏆 P1 qalib!");
+            return true;
+          }
+          if(p2.score >= goal){
+            pause(true);
+            setOverlay(`🏆 QALİB: <b>P2 (Sevgilin)</b> 💖<br/>P1: ${p1.score} | P2: ${p2.score}<br/><span style="opacity:.85;font-weight:800;">Yenidən: “Yenidən”</span>`, true);
+            showToast("🏆 P2 qalib!");
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function stepPlayer(player, other){
+        player.dir = player.next;
+
+        const head = player.snake[0];
+        let nx = head.x + player.dir.x;
+        let ny = head.y + player.dir.y;
+
+        if(wrapWalls){
+          nx = (nx + cols) % cols;
+          ny = (ny + rows) % rows;
+        }else{
+          if(nx < 0 || ny < 0 || nx >= cols || ny >= rows){
+            return { dead:true, reason:"Divara dəydi" };
+          }
+        }
+
+        const newHead = {x:nx, y:ny};
+
+        for(const s of player.snake){
+          if(eq(newHead, s)) return { dead:true, reason:"Özünə dəydi" };
+        }
+
+        if(duo){
+          for(const s of other.snake){
+            if(eq(newHead, s)) return { dead:true, reason:"Digər ilana dəydi" };
+          }
+        }
+
+        player.snake.unshift(newHead);
+
+        if(eq(newHead, apple)){
+          player.score++;
+          if(player.score > best){
+            best = player.score;
+            try{ localStorage.setItem(STORE_BEST, String(best)); }catch(_){}
+          }
+          spawnApple();
+        }else{
+          player.snake.pop();
+        }
+
+        return { dead:false };
+      }
+
+      function step(){
+        const res1 = stepPlayer(p1, p2);
+        if(res1.dead) return gameOver(`P1 uduzdu: ${res1.reason}`);
+
+        if(duo){
+          const res2 = stepPlayer(p2, p1);
+          if(res2.dead) return gameOver(`P2 uduzdu: ${res2.reason}`);
+        }
+
+        updateUI();
+        draw();
+        winnerCheck();
+      }
+
+      function drawRoundedRect(x,y,w,h,r){
+        const rr = Math.max(2, Math.min(r, Math.min(w,h)/2));
+        ctx.beginPath();
+        ctx.moveTo(x+rr,y);
+        ctx.arcTo(x+w,y,x+w,y+h,rr);
+        ctx.arcTo(x+w,y+h,x,y+h,rr);
+        ctx.arcTo(x,y+h,x,y,rr);
+        ctx.arcTo(x,y,x+w,y,rr);
+        ctx.closePath();
+      }
+
+      function drawAvatar(img, ready, cx, cy, size, fallbackText){
+        const r = size/2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.closePath();
+        ctx.clip();
+
+        if(ready && img && img.complete){
+          const iw = img.naturalWidth || 1;
+          const ih = img.naturalHeight || 1;
+          const scale = Math.max(size / iw, size / ih);
+          const dw = iw * scale;
+          const dh = ih * scale;
+          const dx = cx - dw/2;
+          const dy = cy - dh/2;
+          ctx.drawImage(img, dx, dy, dw, dh);
+        }else{
+          ctx.fillStyle = "rgba(255,255,255,.08)";
+          ctx.fillRect(cx-r, cy-r, size, size);
+          ctx.fillStyle = "rgba(255,255,255,.92)";
+          ctx.font = `950 ${Math.floor(size*0.55)}px Poppins, system-ui, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(fallbackText, cx, cy+1);
+        }
+        ctx.restore();
+
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = "rgba(255,255,255,.22)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, r-1, 0, Math.PI*2);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.strokeStyle = cssVar("--accent") || "#ff4d9d";
+        ctx.lineWidth = 3.6;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r-1, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawSnakeBody(snake, tint){
+        for(let i=snake.length-1;i>=0;i--){
+          const s = snake[i];
+          const x = s.x*cell;
+          const y = s.y*cell;
+
+          if(i === 0) continue;
+
+          const alpha = Math.max(0.18, 0.58 - i*0.011);
+          ctx.save();
+          ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+          drawRoundedRect(x+2, y+2, cell-4, cell-4, 12);
+          ctx.fill();
+
+          ctx.globalAlpha = 0.22;
+          ctx.strokeStyle = tint;
+          ctx.lineWidth = 1.3;
+          drawRoundedRect(x+2.5, y+2.5, cell-5, cell-5, 12);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function draw(){
+        if(!canvas) return;
+        if(!ctx) ctx = canvas.getContext("2d");
+
+        const rect = canvas.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+
+        ctx.clearRect(0,0,w,h);
+
+        // soft grid
+        ctx.save();
+        ctx.globalAlpha = 0.10;
+        ctx.strokeStyle = "rgba(255,255,255,.22)";
+        ctx.lineWidth = 1;
+        for(let x=0;x<=cols;x++){
+          const px = x*cell + 0.5;
+          ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, rows*cell); ctx.stroke();
+        }
+        for(let y=0;y<=rows;y++){
+          const py = y*cell + 0.5;
+          ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(cols*cell, py); ctx.stroke();
+        }
+        ctx.restore();
+
+        // border
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.strokeStyle = "rgba(255,255,255,.28)";
+        drawRoundedRect(1,1, cols*cell-2, rows*cell-2, 18);
+        ctx.stroke();
+        ctx.restore();
+
+        const p2Tint = "rgba(255,77,157,.85)";
+        const p1Tint = "rgba(61,123,253,.75)";
+
+        // apple (NOW IMAGE-CHANGEABLE)
+        const ax = apple.x*cell + cell/2;
+        const ay = apple.y*cell + cell/2;
+        drawAvatar(imgApple, appleReady, ax, ay, Math.min(cell*1.85, 70), "🍎");
+
+        // bodies
+        drawSnakeBody(p1.snake, p1Tint);
+        if(duo) drawSnakeBody(p2.snake, p2Tint);
+
+        // heads (BIG)
+        const h1 = p1.snake[0];
+        drawAvatar(imgP1, p1Ready, h1.x*cell + cell/2, h1.y*cell + cell/2, Math.min(cell*1.55, 52), "😎");
+
+        if(duo){
+          const h2 = p2.snake[0];
+          drawAvatar(imgP2, p2Ready, h2.x*cell + cell/2, h2.y*cell + cell/2, Math.min(cell*1.55, 52), "💖");
+        }
+
+        // hint text
+        ctx.save();
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = "rgba(255,255,255,.9)";
+        ctx.font = "800 12px Poppins, system-ui, sans-serif";
+        ctx.fillText(duo ? "Duo: WASD + Ox" : "Solo: WASD", 14, 20);
+        ctx.restore();
+      }
+
+      function startLoop(){
+        const sp = getSpeed();
+        const interval = Math.floor(1000 / sp);
+        timer = setInterval(step, interval);
+      }
+      function stopLoop(){ clearInterval(timer); timer = null; }
+
+      function start(){
+        if(running) return;
+        running = true;
+        setOverlay("", false);
+        startLoop();
+        showToast("🐍 Başladı!");
+      }
+
+      function pause(silent=false){
+        if(!running && !timer) return;
+        running = false;
+        stopLoop();
+        if(!silent) showToast("⏸️ Pauza");
+      }
+
+      function reset(){
+        running = false;
+        stopLoop();
+        initState();
+        showToast("🔁 Yenidən başladı");
+      }
+
+      function toggleWrap(){
+        wrapWalls = !wrapWalls;
+        try{ localStorage.setItem(STORE_WRAP, wrapWalls ? "1" : "0"); }catch(_){}
+        updateUI();
+        draw();
+        showToast(wrapWalls ? "🧱 Divar rejimi" : "🌀 Wrap rejimi");
+      }
+
+      function toggleDuo(){
+        duo = !duo;
+        try{ localStorage.setItem(STORE_DUO, duo ? "1" : "0"); }catch(_){}
+        reset();
+        updateUI();
+        showToast(duo ? "👥 Duo açıldı" : "👤 Solo");
+      }
+
+      function onKey(e){
+        const k = e.key.toLowerCase();
+
+        if(k === " "){
+          e.preventDefault();
+          if(running) pause();
+          else start();
+          return;
+        }
+
+        const mapP1 = { "w":"up", "a":"left", "s":"down", "d":"right" };
+        if(mapP1[k]){
+          e.preventDefault();
+          setDirP1(mapP1[k]);
+          return;
+        }
+
+        if(duo){
+          const mapP2 = { "arrowup":"up", "arrowleft":"left", "arrowdown":"down", "arrowright":"right" };
+          if(mapP2[k]){
+            e.preventDefault();
+            setDirP2(mapP2[k]);
+            return;
+          }
+        }
+      }
+
+      function onTouchStart(e){
+        const t = e.touches?.[0];
+        if(!t) return;
+        touchStart = {x: t.clientX, y: t.clientY};
+      }
+      function onTouchMove(e){
+        if(e.cancelable) e.preventDefault();
+      }
+      function onTouchEnd(e){
+        if(!touchStart) return;
+        const t = e.changedTouches?.[0];
+        if(!t) return;
+
+        const dx = t.clientX - touchStart.x;
+        const dy = t.clientY - touchStart.y;
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
+
+        if(Math.max(adx, ady) < 26) return;
+
+        let dirName;
+        if(adx > ady) dirName = dx > 0 ? "right" : "left";
+        else dirName = dy > 0 ? "down" : "up";
+
+        if(duo) setDirP2(dirName);
+        else setDirP1(dirName);
+      }
+
+      function applyPreview(previewEl, dataUrl, fallback){
+        if(!previewEl) return;
+        if(dataUrl){
+          previewEl.classList.add("has-img");
+          previewEl.style.backgroundImage = `url(${dataUrl})`;
+          previewEl.textContent = fallback;
+        }else{
+          previewEl.classList.remove("has-img");
+          previewEl.style.backgroundImage = "";
+          previewEl.textContent = fallback;
+        }
+      }
+
+      function bindUpload(inputEl, storeKey, imgObj, setReady, previewEl, fallback){
+        if(!inputEl) return;
+        inputEl.addEventListener("change", () => {
+          const file = inputEl.files?.[0];
+          if(!file) return;
+
+          if(!file.type.startsWith("image/")){
+            showToast("Yalnız şəkil seç 😄");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = String(reader.result || "");
+            try{ localStorage.setItem(storeKey, dataUrl); }catch(_){}
+            imgObj.onload = () => { setReady(true); draw(); };
+            imgObj.src = dataUrl;
+            setReady(true);
+            applyPreview(previewEl, dataUrl, fallback);
+            showToast("✅ Şəkil seçildi");
+          };
+          reader.readAsDataURL(file);
+          inputEl.value = "";
+        });
+      }
+
+      function loadStored(){
+        try{
+          best = Number(localStorage.getItem(STORE_BEST) || "0") || 0;
+          wrapWalls = (localStorage.getItem(STORE_WRAP) || "1") === "1";
+          duo = (localStorage.getItem(STORE_DUO) || "0") === "1";
+        }catch(_){
+          best = 0; wrapWalls = true; duo = false;
+        }
+
+        let d1 = null, d2 = null, d3 = null;
+        try{
+          d1 = localStorage.getItem(STORE_P1_IMG);
+          d2 = localStorage.getItem(STORE_P2_IMG);
+          d3 = localStorage.getItem(STORE_APPLE_IMG);
+        }catch(_){}
+
+        if(d1){
+          imgP1.onload = () => { p1Ready = true; draw(); };
+          imgP1.src = d1;
+          p1Ready = true;
+          applyPreview(p1Preview, d1, "😎");
+        }else{
+          p1Ready = false;
+          applyPreview(p1Preview, null, "😎");
+        }
+
+        if(d2){
+          imgP2.onload = () => { p2Ready = true; draw(); };
+          imgP2.src = d2;
+          p2Ready = true;
+          applyPreview(p2Preview, d2, "💖");
+        }else{
+          p2Ready = false;
+          applyPreview(p2Preview, null, "💖");
+        }
+
+        if(d3){
+          imgApple.onload = () => { appleReady = true; draw(); };
+          imgApple.src = d3;
+          appleReady = true;
+          applyPreview(applePreview, d3, "🍎");
+        }else{
+          appleReady = false;
+          applyPreview(applePreview, null, "🍎");
+        }
+      }
+
+      function init(){
+        if(!canvas) return;
+        ctx = canvas.getContext("2d");
+
+        loadStored();
+
+        if(speedEl) speedEl.addEventListener("input", setSpeedLabel);
+
+        bindUpload(p1Input, STORE_P1_IMG, imgP1, (v)=>p1Ready=v, p1Preview, "😎");
+        bindUpload(p2Input, STORE_P2_IMG, imgP2, (v)=>p2Ready=v, p2Preview, "💖");
+        bindUpload(appleInput, STORE_APPLE_IMG, imgApple, (v)=>appleReady=v, applePreview, "🍎");
+
+        window.addEventListener("keydown", onKey, { passive:false });
+
+        window.addEventListener("resize", () => {
+          const wasRunning = running;
+          pause(true);
+          fitCanvas();
+          draw();
+          if(wasRunning) start();
+        }, { passive:true });
+
+        canvas.addEventListener("touchstart", onTouchStart, { passive:true });
+        canvas.addEventListener("touchmove", onTouchMove, { passive:false });
+        canvas.addEventListener("touchend", onTouchEnd, { passive:true });
+
+        fitCanvas();
+        initState();
+        updateUI();
+        draw();
+      }
+
+      function redraw(){ draw(); }
+
+      return {
+        init, start, pause, reset, toggleWrap, toggleDuo,
+        setDirP2,
+        redraw
+      };
+    })();
+    window.SnakeGame = SnakeGame;
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      Quiz.render();
+      MemoryGame.build();
+      SnakeGame.init();
+    });
+  </script>
+</body>
+</html>

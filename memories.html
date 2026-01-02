@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xatirə Albomu ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent: #ff4d9d;
+
+      --bg0: #070A12;
+      --bg1: #0B1022;
+
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --cardA: rgba(255,255,255,.10);
+      --cardB: rgba(255,255,255,.06);
+
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+
+      --shadow2: 0 16px 50px rgba(0,0,0,.30);
+
+      --blur: blur(18px);
+      --radius2: 26px;
+
+      --meshA: rgba(255,77,157,.22);
+      --meshB: rgba(61,123,253,.18);
+      --meshC: rgba(47,191,113,.16);
+      --meshD: rgba(255,214,10,.10);
+
+      --safeTop: env(safe-area-inset-top, 0px);
+      --safeBottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 800px at 18% 16%, var(--meshA), transparent 55%),
+        radial-gradient(900px 700px at 86% 20%, var(--meshB), transparent 58%),
+        radial-gradient(900px 650px at 75% 92%, var(--meshC), transparent 60%),
+        radial-gradient(700px 600px at 22% 90%, var(--meshD), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+      transition: filter .35s ease, background .35s ease;
+    }
+
+    a{ color: inherit; text-decoration:none; }
+
+    /* Aurora */
+    .aurora{
+      position: fixed;
+      inset:-30vh -20vw;
+      pointer-events:none;
+      z-index:0;
+      opacity:.72;
+      filter: blur(22px) saturate(1.15);
+      mix-blend-mode: screen;
+    }
+    .aurora::before, .aurora::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        conic-gradient(from 180deg at 40% 40%,
+          rgba(255,77,157,.00),
+          rgba(255,77,157,.32),
+          rgba(50,173,230,.22),
+          rgba(52,199,89,.18),
+          rgba(255,214,10,.14),
+          rgba(255,77,157,.26),
+          rgba(255,77,157,.00)
+        );
+      animation: spin 26s linear infinite;
+      transform-origin: 40% 40%;
+    }
+    .aurora::after{
+      inset: 10% 15%;
+      opacity:.68;
+      animation-duration: 34s;
+      transform-origin: 60% 60%;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    /* Grain */
+    .grain{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:.12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* Reveal */
+    .reveal{ opacity: 1; transform: none; }
+    html.js .reveal{
+      opacity: 0;
+      transform: translateY(10px) scale(.995);
+      transition: opacity .6s ease, transform .7s ease;
+      will-change: opacity, transform;
+    }
+    html.js .reveal.show{
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(18px + var(--safeBottom));
+      z-index: 5000;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.50);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: rgba(255,255,255,.92);
+      box-shadow: 0 18px 70px rgba(0,0,0,.40);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      font-weight: 800;
+      font-size: .9rem;
+      max-width: min(92vw, 560px);
+      text-align:center;
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    /* Scroll progress */
+    .scroll-progress{
+      position: fixed;
+      top:0; left:0;
+      width:100%;
+      height: 3px;
+      z-index: 9999;
+      background: rgba(255,255,255,.06);
+    }
+    .scroll-progress-bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,.85));
+      box-shadow: 0 0 18px rgba(255,77,157,.45);
+    }
+
+    /* Theme switcher */
+    .theme-switcher{
+      position: fixed;
+      right: 14px;
+      top: calc(14px + var(--safeTop));
+      z-index: 300;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      display:grid;
+      grid-template-columns: repeat(2, 34px);
+      gap: 8px;
+    }
+    .theme-switcher button{
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.30);
+      cursor:pointer;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .theme-switcher button:hover{
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.55);
+    }
+    .theme-switcher button.active{
+      border-color: rgba(255,255,255,.90);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.10), 0 0 26px rgba(0,0,0,.22);
+      transform: scale(1.06);
+    }
+
+    .container{ width: 100%; }
+
+    /* App container */
+    .app{
+      position: relative;
+      z-index: 3;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safeTop)) 18px calc(28px + var(--safeBottom));
+    }
+
+    /* Panels / glass */
+    .glass{
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+    }
+    .glass-inner{ padding: 18px; }
+
+    header{ display:flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+    h1{
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.0rem, 3.7vw, 2.6rem);
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+      color: rgba(255,255,255,.96);
+    }
+    .subtitle{
+      margin: 8px 0 0;
+      font-family: "Dancing Script", cursive;
+      font-size: 1.35rem;
+      color: var(--muted);
+    }
+
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 900;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      white-space: nowrap;
+    }
+    .back-link:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+
+    .hero{ margin-top: 14px; }
+    .hero .glass-inner{
+      padding: 20px;
+      position: relative;
+    }
+    .hero .glass-inner::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(620px 280px at 20% 22%, rgba(255,77,157,.22), transparent 60%),
+                  radial-gradient(620px 280px at 80% 78%, rgba(61,123,253,.18), transparent 60%);
+      opacity: .75;
+      filter: blur(18px);
+      z-index: 0;
+    }
+    .hero .glass-inner > *{ position: relative; z-index: 1; }
+
+    .counter{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .counter-box{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      padding: 14px;
+    }
+    .counter-box > div:first-child{
+      color: var(--muted2);
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+    .counter-value{
+      margin-top: 6px;
+      font-size: 1.55rem;
+      color: rgba(255,255,255,.96);
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+
+    /* ✅ Month chip button (modern) */
+    .chip-btn{
+      width: 100%;
+      text-align: left;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px 12px;
+      cursor: pointer;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      margin-top: 8px;
+      font-weight: 950;
+      color: rgba(255,255,255,.96);
+    }
+    .chip-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.09);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+    .chip-btn:active{ transform: translateY(0) scale(.995); }
+    .chip-sub{
+      font-weight: 800;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .chev{
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      flex: 0 0 auto;
+    }
+
+    .memory-filter{ margin: 14px 0; }
+    .memory-filter .glass-inner{
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .memory-filter label{ color: var(--muted2); font-size: 0.92rem; }
+    .memory-filter select{
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.90);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .memory-filter select:focus{ border-color: rgba(255,255,255,.28); }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .card{
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 54px rgba(0,0,0,.26);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 22px 70px rgba(0,0,0,.34);
+    }
+    .card img{
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.02) contrast(1.02);
+    }
+    .card-body{ padding: 12px 14px 16px; }
+    .card h2{
+      margin: 0 0 6px;
+      color: rgba(255,255,255,.96);
+      font-size: 1.1rem;
+      letter-spacing: -0.2px;
+    }
+    .card small{ color: var(--muted); }
+    .overlay{
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.76), transparent 62%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: grid; place-items: end;
+      padding: 14px;
+      color: rgba(255,255,255,.96);
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .card:hover .overlay{ opacity: 1; }
+
+    .modal{
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.78);
+      z-index: 1000;
+      padding: 30px 10px;
+    }
+    .modal-content{
+      max-width: 600px;
+      margin: 0 auto;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.36));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: 0 26px 80px rgba(0,0,0,.55);
+      padding: 18px 18px 12px;
+      position: relative;
+      color: rgba(255,255,255,.92);
+    }
+    .close-btn{
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      font-size: 28px;
+      cursor: pointer;
+      color: rgba(255,255,255,.72);
+      user-select:none;
+    }
+    .close-btn:hover{ color: rgba(255,255,255,.92); }
+
+    .modal-title{
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      color: rgba(255,255,255,.96);
+      font-family: "Playfair Display", serif;
+      letter-spacing: -0.3px;
+    }
+    .modal-text{
+      line-height: 1.75;
+      color: rgba(255,255,255,.88);
+      white-space: pre-wrap;
+    }
+    .modal-footer{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .nav-btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+    }
+    .nav-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+    .nav-btn:active{ transform: translateY(0) scale(.99); }
+
+    .modal-index{ color: var(--muted2); font-weight: 800; }
+
+    footer{ text-align: center; color: var(--muted2); margin: 22px 0 10px; font-size: .9rem; }
+
+    /* ✅ Modern Month Sheet */
+    .sheet{
+      position: fixed;
+      inset: 0;
+      z-index: 4500;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 14px 14px calc(14px + var(--safeBottom));
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .sheet.show{ display: flex; }
+    .sheet-card{
+      width: min(760px, 100%);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.34));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: 0 26px 90px rgba(0,0,0,.58);
+      overflow: hidden;
+      transform: translateY(14px);
+      opacity: 0;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+    .sheet.show .sheet-card{
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .sheet-head{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .sheet-title{
+      font-weight: 1000;
+      letter-spacing: -.2px;
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.95);
+    }
+    .sheet-sub{
+      color: var(--muted);
+      font-weight: 750;
+      font-size: .9rem;
+      margin-top: 2px;
+    }
+    .sheet-close{
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      font-size: 22px;
+      cursor: pointer;
+      transition: transform .14s ease, background .14s ease;
+    }
+    .sheet-close:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+    .sheet-close:active{ transform: translateY(0) scale(.99); }
+
+    .month-grid{
+      padding: 14px 16px 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 640px){
+      .month-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .month-card{
+      text-align: left;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 12px;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+      position: relative;
+      overflow:hidden;
+    }
+    .month-card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(360px 240px at 20% 10%, rgba(255,77,157,.14), transparent 62%),
+        radial-gradient(360px 240px at 90% 20%, rgba(61,123,253,.10), transparent 62%);
+      opacity: .75;
+      pointer-events:none;
+    }
+    .month-card > *{ position:relative; z-index:1; }
+
+    .month-card:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.09);
+      box-shadow: 0 18px 55px rgba(0,0,0,.30);
+    }
+    .month-card:active{ transform: translateY(0) scale(.995); }
+
+    .month-card.active{
+      border-color: rgba(255,255,255,.24);
+      box-shadow: 0 0 0 2px rgba(255,255,255,.16), 0 22px 70px rgba(0,0,0,.36);
+    }
+
+    .month-top{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .badge{
+      width: 34px;
+      height: 34px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      font-weight: 1000;
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.95);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+    .month-name{
+      margin-top: 8px;
+      font-weight: 1000;
+      color: rgba(255,255,255,.96);
+      letter-spacing: -.2px;
+      line-height: 1.25;
+    }
+    .month-meta{
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .9rem;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 18px rgba(255,77,157,.30);
+    }
+
+    @media (max-width: 520px){
+      .card img{ height: 200px; }
+      .theme-switcher{ right: 10px; }
+      .app{ padding-left: 14px; padding-right: 14px; }
+    }
+  
+
+    /* ✅ Scroll-açılan "Polaroid Stack" (2-ci şəkil kimi) */
+    .scrapbook-wrap{ margin-top: 16px; }
+    .scrapbook-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .scrapbook-title{
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: 1.35rem;
+      letter-spacing: -0.2px;
+      color: rgba(255,255,255,.96);
+      line-height: 1.15;
+    }
+    .scrapbook-sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+    .scrapbook-meta{
+      color: var(--muted2);
+      font-weight: 850;
+      font-size: .92rem;
+      white-space: nowrap;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+    }
+
+    .scrapbook-board{
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 18px 16px 22px;
+      background:
+        radial-gradient(780px 520px at 12% 18%, rgba(47,191,113,.28), transparent 58%),
+        radial-gradient(860px 560px at 92% 14%, rgba(61,123,253,.22), transparent 60%),
+        radial-gradient(760px 560px at 70% 95%, rgba(255,77,157,.14), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.22));
+      box-shadow: 0 26px 90px rgba(0,0,0,.36);
+    }
+    .scrapbook-board::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(900px 420px at 50% 0%, rgba(255,255,255,.08), transparent 60%),
+        radial-gradient(650px 420px at 15% 55%, rgba(255,255,255,.06), transparent 60%);
+      opacity:.9;
+      filter: blur(16px);
+      pointer-events:none;
+    }
+    .scrapbook-board > *{ position: relative; z-index: 1; }
+
+    .paper-stack{
+      width: min(460px, 100%);
+      margin: 0 auto;
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0 2px;
+    }
+
+    .paper{
+      --dx: 0px;
+      --dy: 0px;
+      --rot: 0deg;
+
+      --op: 1;
+      --blurPx: 0px;
+      --popY: 0px;
+      --popS: 1;
+
+      width: min(420px, 100%);
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+      color: #121212;
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: 0 18px 55px rgba(0,0,0,.30);
+      overflow: hidden;
+      position: relative;
+
+      opacity: var(--op);
+      filter: blur(var(--blurPx));
+      transform:
+        translateX(var(--dx))
+        translateY(var(--dy))
+        rotate(var(--rot))
+        translateY(var(--popY))
+        scale(var(--popS));
+      transform-origin: 50% 85%;
+
+      transition:
+        opacity .65s ease,
+        transform .85s cubic-bezier(.2,.9,.2,1),
+        filter .65s ease;
+      will-change: transform, opacity, filter;
+    }
+
+    /* "Tape" */
+    .paper::before{
+      content:"";
+      position:absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 134px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.55));
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: 0 12px 26px rgba(0,0,0,.16);
+      opacity: .92;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+
+    .paper + .paper{ margin-top: -112px; }
+
+    .paper.photo img{
+      width: 100%;
+      height: 238px;
+      object-fit: cover;
+      display:block;
+      background: rgba(0,0,0,.06);
+    }
+    .paper.photo figcaption{
+      padding: 10px 12px 14px;
+      font-family: "Dancing Script", cursive;
+      font-size: 1.18rem;
+      color: rgba(0,0,0,.82);
+      line-height: 1.25;
+    }
+    .paper.photo figcaption .cap-sub{
+      display:block;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-size: .86rem;
+      margin-top: 4px;
+      color: rgba(0,0,0,.56);
+      font-weight: 750;
+    }
+
+    .paper.p1{ --dx:-12px; --dy: 6px;  --rot: -6deg; }
+    .paper.p2{ --dx: 14px; --dy: 0px;  --rot:  4deg; }
+    .paper.letter{ --dx: 0px;  --dy:-8px; --rot: -1.5deg; }
+
+    /* reveal-dən sonra "açılış" effektləri */
+    .scrapbook-wrap.reveal .paper{
+      --op: 0;
+      --blurPx: 3px;
+      --popY: 26px;
+      --popS: .96;
+    }
+    .scrapbook-wrap.reveal.show .paper{
+      --op: 1;
+      --blurPx: 0px;
+      --popY: 0px;
+      --popS: 1;
+    }
+    .scrapbook-wrap.reveal .paper.p1{ transition-delay: .05s; }
+    .scrapbook-wrap.reveal .paper.p2{ transition-delay: .20s; }
+    .scrapbook-wrap.reveal .paper.letter{ transition-delay: .35s; }
+
+    @keyframes floaty{
+      0%,100%{ transform:
+        translateX(var(--dx)) translateY(var(--dy)) rotate(var(--rot))
+        translateY(0px) scale(1);
+      }
+      50%{ transform:
+        translateX(var(--dx)) translateY(var(--dy)) rotate(var(--rot))
+        translateY(-6px) scale(1.003);
+      }
+    }
+    .scrapbook-wrap.reveal.show .paper{
+      animation: floaty 8s ease-in-out infinite;
+    }
+    .scrapbook-wrap.reveal.show .paper.p2{ animation-duration: 9.5s; }
+    .scrapbook-wrap.reveal.show .paper.letter{ animation-duration: 10.5s; }
+
+    /* Letter open/close */
+    .letter-shell{ display:block; }
+    .letter-front{
+      width: 100%;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      padding: 16px 16px 14px;
+      display:block;
+      color: rgba(0,0,0,.86);
+    }
+    .letter-front-row{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+    .letter-stamp{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+      font-size: 20px;
+      flex: 0 0 auto;
+    }
+    .letter-front-title{
+      font-weight: 950;
+      letter-spacing: -0.2px;
+      font-size: 1.05rem;
+      line-height: 1.2;
+    }
+    .letter-front-hint{
+      margin-top: 4px;
+      font-weight: 800;
+      color: rgba(0,0,0,.55);
+      font-size: .9rem;
+    }
+
+    .letter-body{
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: max-height .65s ease, opacity .35s ease, transform .45s ease;
+      padding: 0 16px;
+    }
+    .letter-body-title{
+      margin: 10px 0 8px;
+      font-family: "Playfair Display", serif;
+      font-size: 1.15rem;
+      letter-spacing: -0.2px;
+      color: rgba(0,0,0,.86);
+    }
+    .letter-body-text{
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: rgba(0,0,0,.74);
+      font-weight: 700;
+      font-size: .95rem;
+      padding-bottom: 8px;
+    }
+    .letter-close{
+      margin: 8px 0 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(0,0,0,.06);
+      color: rgba(0,0,0,.82);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .14s ease, background .14s ease;
+      width: 100%;
+    }
+    .letter-close:hover{ transform: translateY(-1px); background: rgba(0,0,0,.08); }
+    .letter-close:active{ transform: translateY(0) scale(.99); }
+
+    .paper.letter.open .letter-body{
+      max-height: 520px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .paper.letter.open .letter-front{
+      opacity: .98;
+    }
+
+    @media (max-width: 520px){
+      .paper.photo img{ height: 220px; }
+      .paper + .paper{ margin-top: -98px; }
+      .scrapbook-meta{ white-space: normal; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar" id="scrollBar"></div></div>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Tema switcher -->
+  <div class="theme-switcher" aria-label="Tema seçimi">
+    <button id="theme-pink"  data-theme="pink"  title="pink"  style="background: rgba(255,77,157,.95)"></button>
+    <button id="theme-blue"  data-theme="blue"  title="blue"  style="background: rgba(61,123,253,.95)"></button>
+    <button id="theme-green" data-theme="green" title="green" style="background: rgba(47,191,113,.95)"></button>
+    <button id="theme-night" data-theme="night" title="night" style="background: rgba(10,10,20,.95)"></button>
+  </div>
+
+  <div class="app">
+    <div class="container">
+      <div class="glass hero reveal">
+        <div class="glass-inner">
+          <header>
+            <a class="back-link" href="index.html">← Əsas Səhifə</a>
+            <div>
+              <h1>Xatirə Albomu</h1>
+              <p class="subtitle">Şəkillərə toxun, hekayələri oxu – hər birində sən varsan 💌</p>
+            </div>
+          </header>
+
+          <div class="counter">
+            <div class="counter-box">
+              <div>Birlikdə olduğumuz Sevgi Dövrü:</div>
+              <div id="countdown-timer" class="counter-value">0 Gün</div>
+            </div>
+
+            <div class="counter-box">
+              <div>Ay bölməsi (toxun seç):</div>
+              <button id="month-chip" class="chip-btn" type="button">
+                <span>
+                  <span id="month-chip-text">Hamısı</span>
+                  <span class="chip-sub" id="month-chip-sub">Bölmə seçmək üçün toxun</span>
+                </span>
+                <span class="chev">⌄</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="memory-filter glass reveal">
+        <div class="glass-inner">
+          <div>
+            <label for="memory-select">Xüsusi bir xatirəni seç:</label>
+            <select id="memory-select"><option value="">Hamısını göstər</option></select>
+          </div>
+
+          <div>
+            <label>Ümumi say:</label>
+            <div id="memory-count" class="counter-value">0</div>
+          </div>
+        </div>
+      </div>
+
+      <main id="memories-list" class="grid"></main>
+
+      <!-- ✅ Scroll endikcə açılan xüsusi "stack" bölməsi -->
+      <section class="scrapbook-wrap glass reveal" id="special-stack">
+        <div class="glass-inner">
+          <div class="scrapbook-head">
+            <div>
+              <h2 class="scrapbook-title" id="specialStackHeading">Xüsusi Səhifə 💚</h2>
+              <div class="scrapbook-sub" id="specialStackSub">Aşağı endikcə açılan balaca bir sürpriz…</div>
+            </div>
+            <div class="scrapbook-meta" id="specialStackDate">12 Dekabr, 2025</div>
+          </div>
+
+          <div class="scrapbook-board" aria-label="Şəkillər və məktub bölməsi">
+            <div class="paper-stack">
+
+              <figure class="paper photo p1" aria-label="1-ci şəkil">
+                <img id="specialPhoto1" src="https://i.ibb.co/gLLz3qWt/Whats-App-mage-2026-01-01-at-20-51-07-1.jpg" alt="Xüsusi şəkil 1" loading="lazy" decoding="async">
+                <figcaption>
+                  <span id="specialCaption1">Birinci şəkil ✨</span>
+                  <span class="cap-sub">xatirəmizdən bir kadr</span>
+                </figcaption>
+              </figure>
+
+              <figure class="paper photo p2" aria-label="2-ci şəkil">
+                <img id="specialPhoto2" src="https://i.ibb.co/gLLz3qWt/Whats-App-mage-2026-01-01-at-20-51-07-1.jpg" alt="Xüsusi şəkil 2" loading="lazy" decoding="async">
+                <figcaption>
+                  <span id="specialCaption2">İkinci şəkil 💫</span>
+                  <span class="cap-sub">gözümün içi gülən an</span>
+                </figcaption>
+              </figure>
+
+              <div class="paper letter" id="specialLetter" aria-label="Məktub">
+                <button class="letter-front" type="button" aria-expanded="false">
+                  <div class="letter-front-row">
+                    <div class="letter-stamp">💌</div>
+                    <div>
+                      <div class="letter-front-title" id="specialLetterFrontTitle">Məktub</div>
+                      <div class="letter-front-hint" id="specialLetterFrontHint">Açmaq üçün toxun</div>
+                    </div>
+                  </div>
+                </button>
+
+                <div class="letter-body" aria-hidden="true">
+                  <div class="letter-body-title" id="specialLetterTitle">Sənə balaca bir sözüm var…</div>
+                  <div class="letter-body-text" id="specialLetterText">Gozeeelim bidenemm bilirem yatrsan amma icimnen gelr deye yazram…..) cox qeribedi dehset cox darxram sevreme seni her seher oldugu kimi birinci senin adivi fikirlesb oynaacam
+Sevgilim seninle keçirdiyim her an qelbimin en derin yerlerine toxunan bir möcüzze kimidi Heyatıma geldiyin o günnen beri her şey bir başqa gözel oldu Gözlerinin içindeki o ışıltı en qaranlıq anlarımda bele mene yol gösterir Seninle birlikde yaşamaq heyatda en doğru qerarı verdiyimi her an hiss etdirirrr çünki seninle her şey mümkündüee Sene olan sevgim her keçen gün daha da çoxalırr Seninle birliyde dünyanın bütün çetinliklerine qarşı dimdik dura bilerem çünki senin sevgin mene her zaman en böyük cesareti verir Sen menim heyatımın menası gözelimseen sennen bir ömür boyu bu sefere çıxmaq en böyüy arzumdu
+Seni çox sevirem ve bu sevginin sona qeder  süreceyinden heç şübhem yoxduuu - bil ki bu sözləri yazanda içimdə o ilk görüşdüyümüz günün həyəcanı var heç azalmayıb əksinə her keçen gün daha da böyüyüb. Seninle keçen hər deqiqə hər saniyə menim üçün en qiymətli şeyi O ilk tanış olduğumuz günü yada sal... elebir kosmos, ulduzlar hamısı bizi bir araya gətirmək üçün düzülmüşdü. 🤣 O an hiss elediyim duyğu heç nəyə deyişmerem. O vaxt hiss eledm ki elebir ruhumun yarımçıq qalmış yeri tamamlandı Seninle olan o ilk günlər qelbimin ən tez vurduğu, ən təmiz ən şirin həyəcanları yaşadığım anlardı Əl-ələ tutanda bir-birimizə baxanda bütün dünya susurdu vaxt dayanmışdı O gündən bu yana səninlə yaşadığımz hər anı hər günü ürəyimdə xüsusi bir yerdə sevgi ilə saxlayıram. Birlikdə qurduğumuz o sadə arzularımız səhərlər oyandıqda üzümdəki kiçik bir gülümsəmə, çətin günlərdə mənə verdiyin o möhkəm dəstəy.. Bunların hamısı bizim özəl hekayəmizdiee Seninleyken nemme Mənə hiss etdirdiyin o saf sevgi, o etibar hissi, məni mən eleyen ən gözəl hissdi. Hər keçən gün, sənə olan sevgim daha da dərinləşir, daha da böyüyür Senin gözlərinə baxanda mən təkcə gələcəyi yox həm də rahatlığı və xoşbəxtliyi görürəm Sən mənim ilk həyəcanım son dayanacağın ən böyük aşkmmsaane. Nə yaxşı ki o gün yollarımız kəsişdi göz gözə gəldiy, həyatıma bu qədər gözəllik gətirdin. Seni sözlərlə ifade etmək çətindi amma bil ki sənə çooox böyük bir sevgi ilə bağlıyam! Nemmme dəhşət çox deyəcəy şeylər var amma o qede qorxuramki ani bir hereketimde seni itirerem veya nem xetrive deyerem inciderem buna gore her hereketimi ayri ayriliqda fikirlesirem diqqet yetitirem nem hemn oyun oynadigimz futbol oynadgmz gun cox qeribe idim düzdü Sevdiyim qadına qarşı sehf bir hereketm ola bilmez bunu defelerle senle danışmışıq ve billemki sen mennende dehsetsen🤣🤣 yenede yeni ozumde cox caresiz idim hecbir prinsipe girdiyim mamentde ozumu itirmemisem veya prinsipe girib uduzmamışam en aznnan qarsmdaki sozu dile getiribki he bacarirsan bunu menm hecvaxt niyyetim sene qarsi pis olmaz senle yatmag istemey olsa bele nem veya seni opmey seni qucağlamag herseyde Yeni yenede sevdiyimnendi hamisi ve Heqiqetende ne desende men cannan basnan yerine yetirerem cunki nem qadinimin sozunu dinlemey acizliy yox bas tacidi menim üçün seviremse incidsem xetrne deysem ozum cox pis olaram ona göre her hereketi eliyende sene defelerle sorusuram nem soz aliramki sonra problem yaranmasın sadece isteyremki ne elesemde yeni meni basglaariynan bir tutmagivi itemrem cunki heqiqeten iyreneremki men nem durub Babinik veya cindirin biriynen bir tutulum bu qede hissler dusuncelerm ola ola Seni hedsiz çoxxxx sevirem ve seni gorende heqiqeten dilim dolaşır elim ayağım bir birine girir belli elemesemde sadece dilim dolasdigi cox bellidi oyun gunnenn elave her gorusduyum nem getdymiz yol o qede huzur o qede xosbext oluramki adice quacgliyanda o qoxunu icime alirama Nemm yadmnan cixmir eriyirem Sennen elədiyimiz davanı heçbir insana deyismerem ister en yaxissi ister en pisi ister ister en gozeli olsun yenede seni heckime dəyişmərəm Mən səni bu həyatda hər şeydən çox sevirəm və bu həmişə belə qalacaq. Qəlbim ömrümün son damlasına qədər sənin üçün döyməyə davam eləyəcəyyy Bəzən mübahisə eləsəy də dalaşsaq da mən səndən heç vaxt vaz keçmereme Sən mənim həyatımmm , qəlbimin bir parçasısan. Bütün bunlara baxmayaraq, bəlkə bir gün Allah yollarımızı ayırar… (ALLAH ELƏMƏSİN) Əgər elə olsa, o zaman səni necə şərtsiz və qarşılıqsız sevdiyimi yaddan çıxartma Heç kimə qulaq asma, heç kim üçün özünü üzmə mən olsam belə. Seni tanidigim günne MİNNN ŞÜKÜRRR Sənnən keçirdiyimiz hər gün mənə dərin bir rahatlığ verir Çünki sən olduğun kimi qalmağı bacaran təbii səmimi birisən Mən də sənin yanında özüm oluram heç nəyimi gizlətmirəm hər şey yerinə oturur.. elə buna görə səni sevməy mənim üçün çətin deyil, əksinə çox asandı❤️ Bəzən səni Belə aralığsız dayanmadan qucaqlamağ istiyirəm yaxınlığını hiss eləməy sadəcə sakitcə yan-yana oturmaq… Bilmirəm niyə, amma sənin toxunuşunda insana rahatlıq verən bir istiliy var. O an içimdə sakit bir istəy olur abartısız tam təbii… sadəcə sən olduğun üçün.🫂 Mən heç vaxt fikirləşməmişdim ki kimisə bu qədər çox bu qədər dərin sevə bilərəm. Sən mənim gələcəyə atdığım hər bir addımın səbəbisəneee Mən sabah nə eləyəcəyimi necə edeceyiki fikirləşəndə o planda həmişə sən varsan. Bil ki səninlə olmaq mənim üçün bir şansdı Allahın mənə bəxş etdiyi ən böyük lütfdü Həmişə xoşbəxt olaq. 
+He birde bu çoxx sevmey sohbeti 
+Sevgilim, gəl bunda sene hisslermnen izah eliyim Mən səni sənin məni sevdiyin kimi sevməyə borclu deyiləm Və sənin məni daha çox sevməyinə də ehtiyac yoxdu Mənim sevgim rəqabət deyil hüzr heqiqidi .
+Mənim sevgim sadəcə sənə aiddi Bidenem💞 Mən səni mən necə hiss edirəmsə elə sevirəm. Bu sevgi, nə sənin, nə də mənim ölçüyə sığdıra biləcəyimiz bir şey deyil. Əsas olan kimin daha böyük sevməsi deyil, əsas olan hər ikimizin bu sevgini gerçəy yaşamasıdı. Və mənim hər hüceyrəmdə sən varsan.
+Bu mübahisə ilə vaxt itirmək əvəzinə gəl bu sevgini daha da gücləndirəy. Sevgimi sübut etməy yerinə sadəcə yaşamaq istəyirəm Və bunu səninlə yaşamaq istəyirəm. Bitdi.🥰
+Heç vaxt unutma: Sən mənim bidənəmsən, gözəlimsən ənn əsası Yoldaşımmsann. SƏNİİ ÇOOOOOX SEVİRƏMMMMM ÇOXLU ÇOXLU öpüreemmmm Ball dodağlarnnann Şipppp şirinnn yuxularrrr heyaaatimmmmm
+
+— hər zaman sənin</div>
+                  <button class="letter-close" type="button">Bağla</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Modal (story) -->
+  <div id="memoryModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">×</span>
+      <h2 id="modal-title" class="modal-title"></h2>
+      <p id="modal-text" class="modal-text"></p>
+      <div class="modal-footer">
+        <button class="nav-btn" id="prev-memory">← Əvvəlki</button>
+        <span class="modal-index" id="modal-index"></span>
+        <button class="nav-btn" id="next-memory">Sonrakı →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Month Sheet -->
+  <div class="sheet" id="monthSheet" aria-hidden="true">
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Ay bölməsi seçimi">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">Ay bölməsini seç</div>
+          <div class="sheet-sub">1-ci ay, 2-ci ay… hamısı burda olacaq ✨</div>
+        </div>
+        <button class="sheet-close" id="monthCloseBtn" type="button">×</button>
+      </div>
+      <div class="month-grid" id="monthGrid"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script>
+    document.documentElement.classList.add('js');
+
+    // 08.11.2025 – ay 0-dan başlayır deyə 10 yazılır (11-ci ay)
+    const startDate = new Date(2025, 10, 8);
+
+    // ✅ Ay bölmələri (istədiyin qədər artır)
+    const monthSections = [
+      { key: "all",     label: "Hamısı" },
+      { key: "2025-11", label: "1-ci ay — Noyabr" },
+      { key: "2025-12", label: "2-ci ay — Dekabr" },
+      { key: "2026-01", label: "3-cü ay — Yanvar" },
+      { key: "2026-02", label: "4-cü ay — Fevral" },
+      { key: "2026-03", label: "5-ci ay — Mart" }
+    ];
+
+    // ✅ Aşağı endikcə açılan "Stack" bölməsi (2 şəkil + 1 məktub)
+    // İstəsən buradakı linkləri və mətni dəyiş, qalan kod toxunulmaz qalır.
+    const specialStackData = {
+      heading: "Xüsusi Səhifə 💚",
+      sub: "Aşağı endikcə açılan balaca bir sürpriz…",
+      date: "12 Dekabr, 2025",
+
+      photo1: "https://i.ibb.co/PZFWHH6h/Whats-App-mage-2026-01-01-at-20-51-07-1.jpg",
+      caption1: "Birinci şəkil ✨",
+      sub1: "xatirəmizdən bir kadr",
+
+      photo2: "https://i.ibb.co/gLS8xbch/Whats-App-mage-2026-01-02-at-13-15-30.jpg",
+      caption2: "İkinci şəkil 💫",
+      sub2: "gözümün içi gülən an",
+
+      letterFrontTitle: "Məktub",
+      letterFrontHint: "Açmaq üçün toxun",
+      letterTitle: "Sənə balaca bir sözüm var…",
+      letterText:
+`...
+— hər zaman sənin`
+    };
+
+    function initSpecialStack(){
+      // başlıq / tarix
+      const h = document.getElementById('specialStackHeading');
+      const s = document.getElementById('specialStackSub');
+      const d = document.getElementById('specialStackDate');
+      if(h) h.textContent = specialStackData.heading;
+      if(s) s.textContent = specialStackData.sub;
+      if(d) d.textContent = specialStackData.date;
+
+      // şəkillər
+      const p1 = document.getElementById('specialPhoto1');
+      const p2 = document.getElementById('specialPhoto2');
+      const c1 = document.getElementById('specialCaption1');
+      const c2 = document.getElementById('specialCaption2');
+
+      if(p1) { p1.src = specialStackData.photo1; p1.alt = specialStackData.caption1 || "Şəkil 1"; }
+      if(p2) { p2.src = specialStackData.photo2; p2.alt = specialStackData.caption2 || "Şəkil 2"; }
+
+      if(c1) c1.textContent = specialStackData.caption1;
+      if(c2) c2.textContent = specialStackData.caption2;
+
+      // caption sub-lar (cap-sub) – varsa doldur
+      const subEls = document.querySelectorAll('#special-stack .cap-sub');
+      if(subEls && subEls.length >= 2){
+        if(subEls[0]) subEls[0].textContent = specialStackData.sub1 || "";
+        if(subEls[1]) subEls[1].textContent = specialStackData.sub2 || "";
+      }
+
+      // məktub
+      const letter = document.getElementById('specialLetter');
+      if(!letter) return;
+
+      const frontTitle = document.getElementById('specialLetterFrontTitle');
+      const frontHint  = document.getElementById('specialLetterFrontHint');
+      const titleEl    = document.getElementById('specialLetterTitle');
+      const textEl     = document.getElementById('specialLetterText');
+
+      if(frontTitle) frontTitle.textContent = specialStackData.letterFrontTitle;
+      if(frontHint)  frontHint.textContent  = specialStackData.letterFrontHint;
+      if(titleEl)    titleEl.textContent    = specialStackData.letterTitle;
+      if(textEl)     textEl.textContent     = specialStackData.letterText;
+
+      const frontBtn = letter.querySelector('.letter-front');
+      const bodyEl   = letter.querySelector('.letter-body');
+      const closeBtn = letter.querySelector('.letter-close');
+
+      const setOpen = (open) => {
+        letter.classList.toggle('open', open);
+        if(frontBtn) frontBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if(bodyEl) bodyEl.setAttribute('aria-hidden', open ? 'false' : 'true');
+      };
+
+      if(frontBtn){
+        frontBtn.addEventListener('click', () => setOpen(!letter.classList.contains('open')));
+      }
+      if(closeBtn){
+        closeBtn.addEventListener('click', () => setOpen(false));
+      }
+    }
+
+
+    // ✅ Xatirələr (hazırkılar noyabr)
+    const memoryData = [
+      { month: "2025-11", title: "1. İlk Görüş Başlanğıc", image: "https://i.ibb.co/bjXRpffW/Whats-App-mage-2025-12-08-at-12-33-16.jpg", text: "Bizim ilk görüşümüzdən sonra, səninlə danışdığımız gecənin səhəri şəhərə çıxmağımız var ha... Bax, o gün mənim üçün həyatımın ən gözəl başlanğıcı idi. Hələ bir neçə saat idi ki, rəsmən Bizz olmuşduq, amma o gün sənə nə qədər yaxın, nə qədər səmimi olduğumu sözlərlə ifadə edə bilmirəm. İlk görüşdüyümüz gün o qədər həyəcanlı idim ki, içimdə 'Yeni nəsə olacaq' deyə çırpınırdı." },
+      { month: "2025-11", title: "2. Gözlərim Səndən Ayrılmadı", image: "https://i.ibb.co/hvxJN9G/Whats-App-mage-2025-12-08-at-12-33-15.jpg", text: " Gözlərimi səndən ayırmaq istəmirdim, çünki hər saniyə dəyərli idi. Gozlerimi heccur sennen ayira bilmrdim ilk görüş idi nem sevmeye bilerdin narahat olmuyasan deye gozlerimi istemeden olsada alirdim sennen ammaki heqiqeten çox aşiq olmusdum" },
+      { month: "2025-11", title: "3. Şən Yemək Anı", image: "https://i.ibb.co/Pv1Xnph7/Whats-App-mage-2025-12-08-at-12-33-16-1.jpg", text: " McDonald'sda yemək yeyib, gülüşdüyümüz anları da heç vaxt unutmayacağam. Amma ən xüsusi anımız... O gün bizə uğur gətirən 8 nömrəli oyuncağı seçməyimiz idi. Bilirsən, o, mənim üçün sadəcə bir oyuncaq deyil. O, bizim xatirəmizdir, hər şeyi birgə seçdiyimizin, birgə başladığımızın simvoludur. Mən onu indiyə qədər saxlayıram və hər dəfə baxanda o gün hiss etdiyim o dolu-dolu sevgi hissi qayıdır. Birlikdə yemək, birlikdə gülmək – xoşbəxtliy budu))." },
+      { month: "2025-11", title: "4. evı qayıdış((", image: "https://i.ibb.co/TBVkzMd8/Whats-App-mage-2025-12-08-at-12-33-16-2.jpg", text: "istemesemde uje eve qayidirdig mecbur idiy amma bu anda heccur yadimnan cixmir Qayidmag istemirdimmm(((" },
+      { month: "2025-11", title: "5. Bağlılıq Hissi", image: "https://i.ibb.co/6cMm8XrT/Whats-App-mage-2025-12-08-at-12-45-17.jpg", text: "Bir-birimizə bağlı olduğumuzu dərinlikdə hiss etdik, ilk opus ilk qucag yasadigimi ve Cox sevincliyem birinciyi sennen yasadigima" },
+      { month: "2025-11", title: "6. Malldan Danışma Dönəmi", image: "https://i.ibb.co/mV22GRNN/Whats-App-mage-2025-12-08-at-12-33-16-3.jpg", text: "Mallda gəzib danışdığımız anlar var ha... Həmin anlarda sənin yanında özümü o qədər rahat hiss edirdim ki, sanki həyatım boyu səni tanıyırmışam. Sən danışanda mən dinləyirdim, güləndə mən də gülürdüm... Mənim üçün ən gözəl hiss o idi: sənin yanındayam və hər şey düzdür." },
+      { month: "2025-11", title: "7. Ürəkləri Paylaşdığımız Gün", image: "https://i.ibb.co/JwGp7vvG/Whats-App-mage-2025-12-08-at-12-33-16-4.jpg", text: "Hemin ureylerimizi bir birimze elbe el verdiyimiz gün)))😂 burdada asiri xosbext idim cox eylenceli idi" },
+      { month: "2025-11", title: "8. Gözlərdəki Təbəssüm", image: "https://i.ibb.co/Zp2Fw4pt/Whats-App-mage-2025-12-08-at-12-33-17.jpg", text: "Burda uje ne desem azdi cunki hiss elediylerim o qeder coxdurkii uje onu heccur belli eleye bilmirem amma uzumdeki tebessume baxarag gozlerme baxarag ancag basa duse bilersen" },
+      { month: "2025-11", title: "9. İlk Lego Datemiz", image: "https://i.ibb.co/ksFZCHXZ/Whats-App-mage-2025-12-08-at-12-33-17-1.jpg", text: "Buda ilk lego bas basa datemiz cox romantikkkkkk coxx xosbextt cox gözel gun idi bunnan oterefesi olsada hal hazirda yoxdu) Seni cox seviremm" },
+      { month: "2025-11", title: "10. Sevgi Dolu Bitiş", image: "https://i.ibb.co/bgv7Hc3W/Whats-App-mage-2025-12-08-at-12-33-17-2.jpg", text: "Bu günə qədər olanların ən gözəl yekunu." }
+   
+      ,
+     // ✅ Dekabr xatirələri
+{ month: "2025-12", title: "11. Ürəyim dolu idi",  image: "https://i.ibb.co/DP20F81Z/Whats-App-mage-2025-12-31-at-21-14-44.jpg",  text: "Bu gün mənim üçün çox xüsusi idi. Sən mənə hədiyyələr almışdın. O an ürəyim elə dolmuşdu ki, sevinməkdən ağlamaq istəyirdim, amma özümü güclə saxladım. Daxilimdə min cür duyğu var idi. Səni nə qədər çox sevdiyimi, nə qədər dəyərli olduğunu bir daha hiss etdim. O hədiyyələrdən çox, sənin bu düşüncən mənim ürəyimi nemmee.." },
+{ month: "2025-12", title: "12. Şəhərdə ikimiz",  image: "https://i.ibb.co/x8H2Xp9P/Whats-App-mage-2026-01-01-at-01-52-04.jpg",  text: "Bu gün birlikdə şəhərə çıxdıq. Bir neçə yerdə gəzdik, sonra bir yerdə oturub yemək yedik. Sadə görünən bu anlar mənim üçün inanılmaz xoş idi. Səninlə yan-yana oturub gülmək, danışmaq, vaxtın necə keçdiyini hiss etməmək… o günün hər saniyəsi yaddaşıma bir başa yazıldı..." },
+{ month: "2025-12", title: "13. Lego date",  image: "https://i.ibb.co/0p5P7q9L/Blank-Collage-Template.jpg"             ,  text: "sonra antikafeyə getdiy. Orda lego date etdik, çox uzun-uzadı söhbət etdik. O qədər rahat və xoşbəxt idim ki, sanki dünya bir anlıq dayanmışdı. Hər şey çox səmimi, çox təmiz idi. O anlarda səninlə olduğuma görə özümü çox şanslı hiss edirdimmm." },
+{ month: "2025-12", title: "14. Sahilə doğru",  image: "https://i.ibb.co/7Jc10PdG/Whats-App-mage-2025-12-31-at-21-14-42-2.jpg",  text: "Antikafedən çıxandan sonra sahilə doğru getdik, uzun müddət gəzdik. Orda bir daydaya yaxınlaşıb bizdən şəkil çəkməsini xahiş etdim. Bu mənim üçün böyük bir cəsarət idi. Şəhərə gedənə qədər yolboyu çox romantik, unudulmaz anlar yaşadığ OHMM. çox xoşbext idimmm.." },
+{ month: "2025-12", title: "15. ...",  image: "https://i.ibb.co/RncXbft/Whats-App-mage-2025-12-31-at-21-14-42-3.jpg",  text: "Burda biraz BİRAZZCk cox pis idin yeni sadece aglamag esebivi birseylerden cixartmag isteyirdin elimnen geldiyi qeder motivasya versemde bu duyguya qarsi gelmey cetin idi amma gorduyun kimi ureyivin temizliyi belli oldu istediyinde oldu tez bir zamanda getdi atan. Uzuvun gulusue qurbaaan Men daha cox sevinmisdimki sen en azinna vurgulamirdin ve Gulurdun." },
+{ month: "2025-12", title: "16. 🏠",  image: "https://i.ibb.co/Df35qTDm/Whats-App-mage-2025-12-31-at-21-14-42.jpg",  text: "Bu gün bizim evdə idiy. Həqiqətən çox şeyin ilk dəfə olduğu bir gün idi. Bir az həyəcan, bir az utancaqlıq, amma çoxlu gülüş və səmimi anlar… Düşünürəm ki, bu hisslər ikimiz üçün də Keçərli çox xüsusi və unudulmaz idi." },
+{ month: "2025-12", title: "17. 🐈",  image: "https://i.ibb.co/k6HGgzxX/Whats-App-mage-2025-12-31-at-21-14-42-4.jpg",  text: "Bu günde biraz çox ağlamşış ola bilersen. Onun itməsi təxminən bir il idi, amma bu xatirə hələ də içimi bir az kədərləndirir. Limona oxşatsanda Yerini vermeyeceydi amma cox isterdim goturey amma ananda haqli idi cunki bit ve kuce pisiyi idi ne qeder limona oxsasada." },
+{ month: "2025-12", title: "18. Mini Pizza DATEEEE",  image: "https://i.ibb.co/7dpS0rxz/Blank-Collage-Template.png",  text: "Bu gün pizza date etdik. Gecə vaxtı birlikdə gəzərək pizza yeməyə getdik. Küçələr, soyuq hava, səninlə yan-yana yerimək və pizzanın dadı… hər şey birləşib çox isti, çox şirin bir xatirəyə çevrildi." },
+{ month: "2025-12", title: "19. Özəl anılardan biri",  image: "https://i.ibb.co/7tM8GB0c/Whats-App-mage-2025-12-31-at-21-14-44-8.jpg",  text: "Bu gün dəhşət çox gülmüşdük. Həqiqətən çox əylənmişdik. Sən bu günü ən əyləncəli günlərimizdən biri kimi sayırdın və çox haqlı idin. Gülməkdən qarnımız ağrıyırdı, zamanın necə keçdiyini belə hiss etmədik. Bu qədər saf gülüş, bu qədər xoş an… menim üçün çox dəyərlidir." },
+{ month: "2025-12", title: "20. Telefon seçimi🤣", image: "https://i.ibb.co/9Hv0PFgC/Whats-App-mage-2025-12-31-at-21-14-41.jpg", text: "Bu gün sən hazırlıqdan çıxıb birbaşa yanımıza gəlmişdin. Sonra anamla birlikdə mən, sən və anam babama telefon seçirdik. O qədər əylənmişdik ki, sanki bir ailə kimi idiy. Anamla sənin bu qədər yaxşı anlaşmağın, birlikdə gülməyimiz, hər şey çox xoş, çox isti bir günə çevrilmişdi. Bu günü həmişə gülümsəyərək xatırlayacam." },
+{ month: "2025-12", title: "21. Öhmm", image: "https://i.ibb.co/9HPs6mQV/Whats-App-mage-2025-12-31-at-21-14-41-1.jpg", text: "27 Dekabr 14:27 Susmuştunn...." },
+    ];
+
+    const modal = document.getElementById('memoryModal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalText = document.getElementById('modal-text');
+    const modalIndex = document.getElementById('modal-index');
+    const closeModal = document.querySelector('.close-btn');
+    const prevBtn = document.getElementById('prev-memory');
+    const nextBtn = document.getElementById('next-memory');
+
+    const memorySelect = document.getElementById('memory-select');
+
+    const monthChip = document.getElementById('month-chip');
+    const monthChipText = document.getElementById('month-chip-text');
+    const monthChipSub = document.getElementById('month-chip-sub');
+
+    const monthSheet = document.getElementById('monthSheet');
+    const monthGrid = document.getElementById('monthGrid');
+    const monthCloseBtn = document.getElementById('monthCloseBtn');
+
+    let activeMonthKey = localStorage.getItem('memoriesActiveMonth') || 'all';
+    let activeMemoryId = ''; // memory-select value (month list local index)
+
+    let visibleIndices = []; // global indices of memoryData currently visible
+    let currentVisiblePos = 0;
+
+    const themes = {
+      pink:  { accent:'#ff4d9d', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,77,157,.22)', meshB:'rgba(61,123,253,.18)', meshC:'rgba(47,191,113,.16)', meshD:'rgba(255,214,10,.10)' },
+      blue:  { accent:'#3d7bfd', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(61,123,253,.22)', meshB:'rgba(255,77,157,.16)', meshC:'rgba(50,173,230,.16)', meshD:'rgba(255,214,10,.08)' },
+      green: { accent:'#2fbf71', bg0:'#070A12', bg1:'#0B1022', cardA:'rgba(255,255,255,.10)', cardB:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(47,191,113,.22)', meshB:'rgba(61,123,253,.14)', meshC:'rgba(255,77,157,.12)', meshD:'rgba(255,214,10,.10)' },
+      night: { accent:'#ffb6c1', bg0:'#040513', bg1:'#02020a', cardA:'rgba(255,255,255,.09)', cardB:'rgba(255,255,255,.05)', stroke:'rgba(255,255,255,.12)', stroke2:'rgba(255,255,255,.18)', meshA:'rgba(255,182,193,.18)', meshB:'rgba(100,120,255,.14)', meshC:'rgba(47,191,113,.10)', meshD:'rgba(255,214,10,.08)' },
+    };
+
+    let toastTimer = null;
+    function showToast(text){
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    function setTheme(name){
+      const t = themes[name];
+      if(!t) return;
+      const root = document.documentElement;
+
+      root.style.setProperty('--accent', t.accent);
+      root.style.setProperty('--bg0', t.bg0);
+      root.style.setProperty('--bg1', t.bg1);
+      root.style.setProperty('--cardA', t.cardA);
+      root.style.setProperty('--cardB', t.cardB);
+      root.style.setProperty('--stroke', t.stroke);
+      root.style.setProperty('--stroke2', t.stroke2);
+      root.style.setProperty('--meshA', t.meshA);
+      root.style.setProperty('--meshB', t.meshB);
+      root.style.setProperty('--meshC', t.meshC);
+      root.style.setProperty('--meshD', t.meshD);
+
+      document.querySelectorAll('.theme-switcher button').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`theme-${name}`);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      localStorage.setItem('websiteTheme', name);
+      showToast(`🎨 Tema dəyişdi: ${name}`);
+    }
+
+    function applySavedTheme(){
+      const savedTheme = localStorage.getItem('websiteTheme') || 'pink';
+      setTheme(savedTheme);
+    }
+
+    function bindThemeButtons(){
+      document.querySelectorAll('.theme-switcher button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-theme');
+          if(name) setTheme(name);
+        });
+      });
+    }
+
+    function updateLoveCounter() {
+      const now = new Date();
+      const diff = now - startDate;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const months = Math.floor(days / 30);
+      const years = Math.floor(months / 12);
+      const remainingMonths = months % 12;
+      const remainingDays = days % 30;
+
+      const timerEl = document.getElementById("countdown-timer");
+      timerEl.textContent = `${years} il ${remainingMonths} ay ${remainingDays} gün`;
+    }
+    setInterval(updateLoveCounter, 1000);
+    updateLoveCounter();
+
+    function getMonthLabel(key){
+      const m = monthSections.find(x => x.key === key);
+      return m ? m.label : "Hamısı";
+    }
+
+    function countForMonth(key){
+      if(key === "all") return memoryData.length;
+      return memoryData.filter(m => (m.month || "all") === key).length;
+    }
+
+    function computeVisibleIndices(){
+      let indices = memoryData.map((_, i) => i);
+
+      if(activeMonthKey !== "all"){
+        indices = indices.filter(i => (memoryData[i].month || "all") === activeMonthKey);
+      }
+
+      if(activeMemoryId !== ""){
+        const pos = Number(activeMemoryId);
+        if(Number.isFinite(pos) && pos >= 0 && pos < indices.length){
+          indices = [indices[pos]];
+        }
+      }
+
+      return indices;
+    }
+
+    function loadMemories() {
+      const list = document.getElementById('memories-list');
+      list.innerHTML = '';
+
+      visibleIndices = computeVisibleIndices();
+
+      visibleIndices.forEach((globalIndex, localIndex) => {
+        const memory = memoryData[globalIndex];
+
+        const card = document.createElement('div');
+        card.className = 'card reveal';
+        card.id = `memory-card-${globalIndex}`;
+
+        const img = document.createElement('img');
+        img.src = memory.image;
+        img.alt = memory.title;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        overlay.textContent = 'Hekayəni oxu →';
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const title = document.createElement('h2');
+        title.textContent = memory.title;
+
+        const small = document.createElement('small');
+        small.textContent = 'Ürəyimdə xüsusi yeri olan gün 💌';
+
+        body.appendChild(title);
+        body.appendChild(small);
+
+        card.appendChild(img);
+        card.appendChild(overlay);
+        card.appendChild(body);
+
+        card.addEventListener('click', () => openModalByVisiblePos(localIndex));
+        list.appendChild(card);
+      });
+
+      document.getElementById('memory-count').textContent = visibleIndices.length;
+    }
+
+    function populateMemorySelect() {
+      const monthList = (activeMonthKey === "all")
+        ? memoryData.map((_, i) => i)
+        : memoryData.map((_, i) => i).filter(i => (memoryData[i].month || "all") === activeMonthKey);
+
+      memorySelect.innerHTML = '<option value="">Hamısını göstər</option>';
+
+      monthList.forEach((globalIndex, localIndex) => {
+        const m = memoryData[globalIndex];
+        const opt = document.createElement('option');
+        opt.value = String(localIndex);
+        opt.textContent = m.title;
+        memorySelect.appendChild(opt);
+      });
+
+      memorySelect.value = activeMemoryId;
+
+      memorySelect.onchange = (e) => {
+        activeMemoryId = e.target.value;
+        refreshAll();
+
+        if(activeMemoryId !== ""){
+          const idxLocal = Number(activeMemoryId);
+          const globalIdx = monthList[idxLocal];
+          const el = document.getElementById(`memory-card-${globalIdx}`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function openModalByVisiblePos(visiblePos){
+      if(!visibleIndices.length) return;
+
+      currentVisiblePos = Math.max(0, Math.min(visibleIndices.length - 1, visiblePos));
+      const globalIndex = visibleIndices[currentVisiblePos];
+      const mem = memoryData[globalIndex];
+
+      modalTitle.textContent = mem.title;
+      modalText.textContent = mem.text;
+      modalIndex.textContent = `${currentVisiblePos + 1} / ${visibleIndices.length}`;
+      modal.style.display = 'block';
+    }
+
+    function closeModalFn() { modal.style.display = 'none'; }
+
+    function initReveal(){
+      const els = Array.from(document.querySelectorAll('.reveal'));
+      if(!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('show'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            entry.target.classList.add('show');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      els.forEach(el => io.observe(el));
+    }
+
+    function initScrollProgress(){
+      const bar = document.getElementById('scrollBar');
+      if(!bar) return;
+
+      const onScroll = () => {
+        const doc = document.documentElement;
+        const scrollTop = doc.scrollTop || document.body.scrollTop;
+        const height = (doc.scrollHeight - doc.clientHeight) || 1;
+        const pct = Math.min(100, Math.max(0, (scrollTop / height) * 100));
+        bar.style.width = pct.toFixed(2) + '%';
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    function refreshAll(){
+      // chip update
+      const label = getMonthLabel(activeMonthKey);
+      monthChipText.textContent = label;
+      monthChipSub.textContent = (activeMonthKey === "all")
+        ? `${memoryData.length} xatirə • hamısı`
+        : `${countForMonth(activeMonthKey)} xatirə • bu ay`;
+
+      loadMemories();
+      populateMemorySelect();
+      initReveal();
+    }
+
+    /* ✅ Month Sheet build + open/close */
+    function parseMonthNumber(label){
+      // "1-ci ay — Noyabr" -> 1
+      const m = label.match(/^(\d+)\-/) || label.match(/^(\d+)\s*ci/) || label.match(/^(\d+)/);
+      return m ? m[1] : "";
+    }
+
+    function buildMonthGrid(){
+      monthGrid.innerHTML = "";
+
+      monthSections.forEach(section => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "month-card";
+        if(section.key === activeMonthKey) btn.classList.add("active");
+
+        const monthNo = (section.key === "all") ? "∞" : (parseMonthNumber(section.label) || "•");
+        const cnt = countForMonth(section.key);
+
+        btn.innerHTML = `
+          <div class="month-top">
+            <div class="badge">${monthNo}</div>
+            <div class="month-meta"><span class="dot"></span> ${cnt} xatirə</div>
+          </div>
+          <div class="month-name">${section.label}</div>
+          <div class="month-meta" style="margin-top:8px;">
+            ${section.key === "all" ? "Bütün aylar" : "Bu bölməni aç"}
+          </div>
+        `;
+
+        btn.addEventListener("click", () => {
+          activeMonthKey = section.key;
+          localStorage.setItem("memoriesActiveMonth", activeMonthKey);
+
+          // ay dəyişəndə xatirə seçimi sıfırlansın
+          activeMemoryId = "";
+          memorySelect.value = "";
+
+          closeMonthSheet();
+          refreshAll();
+          showToast(`📅 Bölmə: ${section.label}`);
+        });
+
+        monthGrid.appendChild(btn);
+      });
+    }
+
+    function openMonthSheet(){
+      buildMonthGrid();
+      monthSheet.classList.add("show");
+      monthSheet.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMonthSheet(){
+      monthSheet.classList.remove("show");
+      monthSheet.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+    }
+
+    monthChip.addEventListener("click", openMonthSheet);
+    monthCloseBtn.addEventListener("click", closeMonthSheet);
+    monthSheet.addEventListener("click", (e) => {
+      if(e.target === monthSheet) closeMonthSheet();
+    });
+
+    /* Modal events */
+    closeModal.onclick = closeModalFn;
+    window.onclick = (e) => { if (e.target === modal) closeModalFn(); };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModalFn();
+        closeMonthSheet();
+      }
+    });
+
+    prevBtn.onclick = () => {
+      if(!visibleIndices.length) return;
+      openModalByVisiblePos((currentVisiblePos - 1 + visibleIndices.length) % visibleIndices.length);
+    };
+    nextBtn.onclick = () => {
+      if(!visibleIndices.length) return;
+      openModalByVisiblePos((currentVisiblePos + 1) % visibleIndices.length);
+    };
+
+    /* Init */
+    document.addEventListener('DOMContentLoaded', () => {
+      applySavedTheme();
+      bindThemeButtons();
+
+      
+
+      initSpecialStack();
+// validate stored month
+      if(!monthSections.some(x => x.key === activeMonthKey)) activeMonthKey = "all";
+
+      refreshAll();
+      initScrollProgress();
+    });
+  </script>
+</body>
+</html>
