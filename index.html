@@ -8,6 +8,123 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <style>
+/* =========================
+   MOBILE FIX PACK (ADD)
+   ========================= */
+
+/* iOS safe-area + real viewport */
+:root{
+  --safeT: env(safe-area-inset-top, 0px);
+  --safeB: env(safe-area-inset-bottom, 0px);
+  --safeL: env(safe-area-inset-left, 0px);
+  --safeR: env(safe-area-inset-right, 0px);
+}
+
+/* Məşhur “mobile 100vh” bug fix: */
+body{
+  min-height: 100svh; /* iOS/Android yeni viewport */
+}
+
+/* Ümumi container-lar telefon üçün nəfəs alsın */
+.container{
+  padding-left: max(14px, var(--safeL));
+  padding-right: max(14px, var(--safeR));
+}
+
+/* NAVBAR: mobilə düşəndə üst-üstə gəlməsin */
+.nav-bar{
+  gap: 10px;
+  padding: 12px 12px;
+  margin: 10px auto 16px;
+}
+
+/* çox səhifədə grid nav var: mobilə 1 sütun */
+@media (max-width: 560px){
+  .nav-bar{
+    grid-template-columns: 1fr !important;
+    align-items: stretch;
+  }
+  .brand{ justify-content: flex-start; }
+  .nav-center{ justify-content: flex-start; }
+  .nav-actions{
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav-link, .music-toggle{
+    flex: 1 1 auto;
+  }
+
+  /* Theme switcher telefon üçün yuxarıda örtməsin */
+  .theme-switcher{
+    top: calc(10px + var(--safeT)) !important;
+    right: 10px !important;
+    transform: scale(.95);
+  }
+
+  /* Başlıqlar mobil ölçü */
+  h1{ font-size: clamp(1.6rem, 7vw, 2.2rem); }
+  h2{ font-size: clamp(1.2rem, 5vw, 1.55rem); }
+
+  /* ümumi bölmələr: padding azalsın */
+  .section{
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* GRID/FLEX bloklar mobilə 1 sütun */
+@media (max-width: 720px){
+  .hero, .card-flex{
+    grid-template-columns: 1fr !important;
+  }
+  .stat-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Slider + iframe xəritə mobil hündürlüyü */
+@media (max-width: 560px){
+  .slider-container{ height: 240px !important; }
+  iframe{ height: 240px !important; }
+}
+
+/* Input/buttonlar mobil tam en */
+input, textarea, button{
+  max-width: 100%;
+}
+
+/* ScrollTop düyməsi safe-area ilə yuxarı qalsın */
+#scrollTopBtn{
+  bottom: calc(18px + var(--safeB)) !important;
+  right: calc(16px + var(--safeR)) !important;
+}
+
+/* Intro (memories.html) mobil optimizasiya */
+@media (max-width: 560px){
+  .intro-card{
+    border-radius: 22px !important;
+    padding: 18px 14px 14px !important;
+  }
+  .intro-top{ gap: 10px; }
+  .intro-heart{ width: 36px; height: 36px; border-radius: 12px; }
+  .intro-badge strong{ font-size: 1.3rem; }
+  .intro-title{ font-size: clamp(1.6rem, 7vw, 2.2rem) !important; }
+  .intro-sub{ font-size: .98rem !important; }
+}
+
+/* Gift səhifəsi üçün (əgər classlar eynidirsə) mobil yığcamlıq */
+@media (max-width: 560px){
+  .gift-grid{
+    grid-template-columns: 1fr !important;
+  }
+  .gift{
+    min-height: auto !important;
+  }
+}
+
+
+    
     :root{
       --accent: #ff4d9d;
 
@@ -914,7 +1031,7 @@
       <div class="inner">
         <div class="spot">
           <div class="kicker"><span class="dot"></span> ilk ayımız </div>
-          <h1>1-ci Ayımız Mübarək, sevgilim! ✨</h1>
+          <h1>1-ci Ayımız Mübarək, sevgilimm! ✨</h1>
           <p class="lead" id="main-subtitle"></p>
 
           <div class="hero-actions">
@@ -1450,3 +1567,4 @@
   </script>
 </body>
 </html>
+
